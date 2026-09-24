@@ -1,0 +1,338 @@
+:root{
+  --navy:#0c2340; --navy2:#354259; --navy3:#546579; --navy4:#7D8A99; --navy5:#9DA7B3;
+  --navy6:#DADEE2; --navy7:#F1F2F3; --red:#da291c; --red2:#ED4239; --red4:#FCB7B3;
+  --red5:#FFE3E3; --redD:#961111; --w:#fff; --ok:#1F6B3A; --okBg:#E6F0E9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{height:100%}
+body{
+  font-family:'Archivo','Helvetica Neue',Helvetica,Arial,sans-serif;
+  background:#E9EBEE; color:var(--navy); line-height:1.45;
+  font-variant-numeric:tabular-nums; -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font-family:inherit}
+
+/* ---------- moldura do app: mobile puro, sem bezel decorativo ---------- */
+.telaApp{max-width:430px;min-height:100vh;margin:0 auto;background:var(--w);position:relative;
+  display:flex;flex-direction:column;box-shadow:0 0 40px rgba(12,35,64,.12)}
+.topoApp{position:sticky;top:0;z-index:15;background:var(--w);border-bottom:1px solid var(--navy6);
+  padding:12px 14px;display:flex;align-items:center;gap:10px}
+.marcaTopo{background:none;border:0;padding:0;cursor:pointer;display:flex;align-items:center}
+.iconeTopo{background:none;border:0;font-size:19px;color:var(--navy);cursor:pointer;padding:4px 6px;
+  position:relative;line-height:1}
+.tituloTopo{flex:1;font-size:15px;font-weight:700;color:var(--navy);text-align:center}
+.acoesTopo{display:flex;align-items:center;gap:4px}
+.carrinhoIcone{position:relative}
+.badge{position:absolute;top:-2px;right:-2px;background:var(--red);color:var(--w);font-size:9.5px;
+  font-weight:700;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center}
+.corpoApp{flex:1;padding:14px 14px 90px}
+
+/* ---------- home ---------- */
+.faixaPromo{background:#1C4A2E;color:var(--w);font-size:11.5px;text-align:center;padding:8px 10px;
+  border-radius:8px;margin-bottom:14px;font-weight:500}
+.heroCompleto{display:block;width:100%;text-align:left;background:linear-gradient(135deg,var(--navy),#16304F);
+  border:0;border-radius:16px;padding:20px 18px;margin-bottom:22px;cursor:pointer;position:relative;overflow:hidden}
+.heroTag{display:inline-block;background:var(--red);color:var(--w);font-size:9.5px;font-weight:700;
+  padding:3px 9px;border-radius:20px;margin-bottom:10px;letter-spacing:.4px}
+.heroCompleto h2{color:var(--w);font-size:21px;font-weight:700;margin-bottom:6px}
+.heroCompleto p{color:var(--navy5);font-size:12.5px;line-height:1.5;margin-bottom:12px;max-width:88%}
+.heroCta{color:#FC6A62;font-weight:700;font-size:13.5px}
+
+.secaoTitulo{font-size:15px;font-weight:700;color:var(--navy);margin:18px 0 12px}
+.gradeCategorias{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}
+.categoriaCard{background:var(--navy7);border:0;border-radius:12px;padding:14px 8px;text-align:center;
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px}
+.categoriaCard:active{background:var(--navy6)}
+.categoriaIcone{font-size:24px}
+.categoriaNome{font-size:10.5px;font-weight:600;color:var(--navy2);line-height:1.25}
+
+.listaServicos{display:flex;flex-direction:column;gap:8px}
+.servicoRow{display:flex;justify-content:space-between;align-items:center;background:var(--w);
+  border:1px solid var(--navy6);border-radius:12px;padding:12px 14px}
+.servicoRow b{font-size:13px;color:var(--navy);display:block;margin-bottom:2px}
+.servicoRow p{font-size:11px;color:var(--navy4)}
+.servicoNota{font-size:12px;font-weight:700;color:var(--ok);white-space:nowrap}
+
+.linkMeusPedidos{display:block;width:100%;text-align:center;background:none;border:1px solid var(--navy6);
+  border-radius:12px;padding:13px;margin-top:22px;font-size:12.5px;font-weight:600;color:var(--navy2);cursor:pointer}
+
+.bannerLinha{display:block;width:100%;text-align:left;background:var(--red5);border:1px solid var(--red4);
+  border-radius:10px;padding:11px 13px;margin-bottom:14px;font-size:11.5px;color:var(--redD);cursor:pointer}
+.bannerLinha b{display:block;margin-top:2px}
+
+/* ---------- listagem e detalhe de produto ---------- */
+.listaProdutos{display:flex;flex-direction:column;gap:10px}
+.produtoCard{display:flex;gap:12px;background:var(--w);border:1px solid var(--navy6);border-radius:12px;
+  padding:12px;text-align:left;cursor:pointer;width:100%}
+.produtoCard:disabled{opacity:.45;cursor:not-allowed}
+.produtoCard.sel{border-color:var(--red);border-width:1.5px;background:var(--red5)}
+.produtoCard.largo{align-items:flex-start}
+.produtoImg{font-size:30px;width:56px;height:56px;background:var(--navy7);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.produtoInfo{display:flex;flex-direction:column;gap:2px;min-width:0}
+.produtoInfo b{font-size:13.5px;color:var(--navy)}
+.produtoDesc{font-size:11px;color:var(--navy4);line-height:1.3}
+.produtoPreco{font-size:14px;font-weight:700;color:var(--navy);margin-top:3px}
+.tagCabe{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;display:inline-block;width:fit-content}
+.tagCabe.sim{background:var(--okBg);color:var(--ok)}
+.tagCabe.nao{background:var(--red5);color:var(--redD)}
+
+.produtoHero{font-size:70px;background:var(--navy7);border-radius:16px;height:200px;display:flex;
+  align-items:center;justify-content:center;margin-bottom:16px}
+.produtoDetalheInfo h2{font-size:19px;color:var(--navy);margin-bottom:6px}
+.produtoDetalheDesc{font-size:13px;color:var(--navy3);margin-bottom:10px;line-height:1.5}
+.produtoDetalhePreco{font-size:22px;font-weight:700;color:var(--navy)}
+.produtoPrazo{font-size:12px;color:var(--navy4);margin-top:6px}
+
+/* ---------- CTA fixo no rodapé de cada tela ---------- */
+.ctaFixo{position:sticky;bottom:0;background:var(--w);padding:14px 0 4px;display:flex;flex-direction:column;
+  gap:8px;margin-top:18px;border-top:1px solid var(--navy6)}
+.btPrimario{background:var(--red);color:var(--w);border:0;border-radius:12px;padding:14px;font-size:14.5px;
+  font-weight:700;cursor:pointer;width:100%}
+.btPrimario:hover{background:var(--red2)}
+.btPrimario:disabled{background:var(--navy6);color:var(--navy4);cursor:not-allowed}
+.btSecundario{background:var(--navy7);color:var(--navy);border:1px solid var(--navy6);border-radius:12px;
+  padding:13px;font-size:13.5px;font-weight:600;cursor:pointer;width:100%}
+
+/* ---------- carrinho ---------- */
+.vazioCarrinho{text-align:center;padding:60px 20px;color:var(--navy4)}
+.vazioCarrinho p{margin-bottom:16px;font-size:14px}
+.itemCarrinho{display:flex;justify-content:space-between;align-items:flex-start;padding:13px 0;
+  border-bottom:1px solid var(--navy6);gap:10px}
+.itemCarrinho b{font-size:13.5px;color:var(--navy)}
+.itemMontagem{display:block;font-size:10.5px;color:var(--navy4);margin-top:2px}
+.itemCarrinhoDireita{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.itemCarrinhoDireita span{font-size:13.5px;font-weight:700;color:var(--navy)}
+.itemCarrinhoDireita button{background:none;border:0;color:var(--navy4);font-size:14px;cursor:pointer}
+.totalCarrinho{display:flex;justify-content:space-between;padding:16px 0;font-size:16px;font-weight:700;color:var(--navy)}
+.vazioTxt{text-align:center;color:var(--navy4);padding:40px 20px;font-size:13px}
+
+/* ---------- checkout ---------- */
+.passosCheckout{display:flex;gap:16px;margin-bottom:18px;font-size:12px;color:var(--navy5);font-weight:600}
+.passosCheckout .ativo{color:var(--red)}
+.formCheckout label,.rotuloSecao{display:block;font-size:11.5px;font-weight:600;color:var(--navy3);margin:12px 0 6px}
+.formCheckout input,.formCheckout select{width:100%;font-size:14px;padding:11px 12px;border:1px solid var(--navy6);
+  border-radius:10px;background:var(--w);color:var(--navy)}
+.formCheckout input:focus,.formCheckout select:focus{outline:2px solid var(--red);outline-offset:-1px;border-color:var(--red)}
+.linhaDupla{display:flex;gap:10px}
+.linhaDupla>div{flex:1}
+.linhaDupla .curta{flex:0 0 90px}
+.cartaoResumo{background:var(--navy7);border-radius:12px;padding:12px 14px;margin:14px 0}
+.linhaResumo{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px 0;
+  border-bottom:1px dotted var(--navy6);color:var(--navy3)}
+.linhaResumo:last-child{border-bottom:0}
+.linhaResumo b{color:var(--navy);white-space:nowrap}
+.linhaResumo.total{border-top:1.5px solid var(--navy6);border-bottom:0;margin-top:4px;padding-top:10px;
+  font-size:14.5px;font-weight:700}
+.opcaoPagamento{display:block;width:100%;text-align:left;background:var(--w);border:1.5px solid var(--navy6);
+  border-radius:12px;padding:13px 14px;margin-bottom:9px;cursor:pointer}
+.opcaoPagamento.sel{border-color:var(--red);background:var(--red5)}
+.opcaoPagamento b{display:block;font-size:13.5px;color:var(--navy)}
+.opcaoPagamento span{font-size:11px;color:var(--navy4)}
+.avisoCredito{background:var(--red5);border:1px solid var(--red4);border-radius:12px;padding:12px 14px;margin-top:6px}
+.avisoCredito b{font-size:12.5px;color:var(--redD);display:block;margin-bottom:3px}
+.avisoCredito p{font-size:11px;color:var(--redD)}
+
+/* ---------- confirmação ---------- */
+.confirmacaoIcone{width:64px;height:64px;background:var(--okBg);color:var(--ok);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;margin:30px auto 18px}
+.confirmacaoTitulo{text-align:center;font-size:18px;color:var(--navy);margin-bottom:8px}
+.confirmacaoTexto{text-align:center;font-size:12.5px;color:var(--navy4);margin-bottom:20px;padding:0 10px}
+
+/* ---------- login e perfil ---------- */
+.perfilCartao{text-align:center;padding:20px 0 24px}
+.perfilAvatar{width:64px;height:64px;background:var(--navy);color:var(--w);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin:0 auto 12px}
+.perfilCartao b{display:block;font-size:16px;color:var(--navy)}
+.perfilCartao span{font-size:12.5px;color:var(--navy4)}
+.linhaMenu{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--navy6);
+  padding:15px 4px;font-size:13.5px;color:var(--navy2);cursor:pointer;font-weight:500}
+.linhaMenu.sair{color:var(--redD)}
+
+/* ---------- fluxo Projeto Completo ---------- */
+.passoIndicador{display:flex;gap:5px;margin-bottom:16px}
+.passoIndicador i{flex:1;height:3px;border-radius:2px;background:var(--navy6);font-style:normal}
+.passoIndicador i.feito{background:var(--red)}
+.passoIndicador i.ativo{background:var(--navy2)}
+.tituloTela{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:8px;line-height:1.28}
+.subtituloTela{font-size:12.5px;color:var(--navy4);line-height:1.5;margin-bottom:14px}
+.chatInput{width:100%;font-size:14px;padding:12px;border:1px solid var(--navy6);border-radius:10px;
+  background:var(--w);color:var(--navy);resize:vertical;margin-bottom:4px}
+.chatInput:focus{outline:2px solid var(--red);outline-offset:-1px;border-color:var(--red)}
+.soltaArquivo{display:block;border:1.5px dashed var(--navy5);border-radius:12px;padding:22px 14px;
+  text-align:center;cursor:pointer;background:var(--navy7);margin-bottom:12px}
+.soltaArquivo b{display:block;font-size:13px;color:var(--navy);margin-bottom:3px}
+.soltaArquivo span{font-size:11px;color:var(--navy4)}
+.prevImg{width:100%;border-radius:10px;margin-bottom:10px;border:1px solid var(--navy6)}
+.carregando{text-align:center;padding:40px 10px}
+.pulso{width:32px;height:32px;border:3px solid var(--navy6);border-top-color:var(--red);border-radius:50%;
+  margin:0 auto 14px;animation:girar 1s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+.tagIA{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--red5);
+  color:var(--redD);border:1px solid var(--red4);margin-left:6px;vertical-align:2px}
+.tagCalc{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--navy7);
+  color:var(--navy2);border:1px solid var(--navy6);margin-left:6px;vertical-align:2px}
+
+.cartao{border:1px solid var(--navy6);border-radius:12px;padding:14px;margin-bottom:12px;background:var(--w)}
+.cartao.alerta{background:var(--red5);border-color:var(--red4)}
+.cartao.bom{background:var(--okBg);border-color:#BFD9C8}
+.cartao.navy{background:var(--navy);border-color:var(--navy)}
+.cartao h4{font-size:13px;font-weight:700;margin-bottom:5px;color:var(--navy)}
+.cartao.navy h4{color:var(--w)}
+.cartao p{font-size:11.5px;margin-bottom:0;color:var(--navy3)}
+.cartao.navy p{color:var(--navy5)}
+
+/* ---------- projeto card (Meus Pedidos / Reforma em Etapas) ---------- */
+.projetoCard{border:1.5px solid var(--navy6);border-radius:12px;padding:14px;margin-bottom:12px;background:var(--w)}
+.projetoCard.ativo{border-color:var(--red);background:var(--red5)}
+.projetoCard.concluido{border-color:#BFD9C8;background:var(--okBg)}
+.projetoTopo{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.projetoBadge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--navy7);color:var(--navy3)}
+.projetoBadge.ativo{background:var(--red);color:var(--w)}
+.projetoBadge.concluido{background:var(--ok);color:var(--w)}
+.projetoCard h5{font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.projetoCard p{font-size:11.5px;color:var(--navy3);margin-bottom:8px}
+.mapaBtn{background:none;border:0;color:var(--red);font-weight:700;font-size:12.5px;cursor:pointer;padding:0}
+
+/* ---------- suporte especializado: flutuante sobre o app ---------- */
+.suporteFAB{position:fixed;bottom:90px;right:calc(50% - 195px);width:44px;height:44px;border-radius:50%;
+  background:var(--navy);color:var(--w);border:2px solid var(--w);font-size:18px;font-weight:700;
+  cursor:pointer;box-shadow:0 4px 14px rgba(12,35,64,.35);z-index:40}
+.suporteFAB:hover{background:var(--red)}
+@media(max-width:430px){.suporteFAB{right:20px}}
+.suporteModal{position:fixed;inset:0;background:rgba(12,35,64,.45);display:flex;align-items:flex-end;
+  justify-content:center;z-index:50}
+.suporteCartao{background:var(--w);width:100%;max-width:430px;border-radius:18px 18px 0 0;max-height:75vh;
+  display:flex;flex-direction:column;box-shadow:0 -8px 24px rgba(12,35,64,.3)}
+.suporteTopo{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 18px;
+  border-bottom:1px solid var(--navy6)}
+.suporteTopo b{display:block;font-size:14.5px;color:var(--navy)}
+.suporteTag{font-size:9.5px;color:var(--redD);background:var(--red5);padding:2px 8px;border-radius:20px;
+  display:inline-block;margin-top:5px;font-weight:700}
+.suporteFechar{background:none;border:0;font-size:16px;color:var(--navy4);cursor:pointer}
+.suporteCorpo{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:9px;min-height:120px}
+.suporteVazio{font-size:12px;color:var(--navy4);line-height:1.5}
+.suporteMsg{font-size:13px;padding:10px 13px;border-radius:13px;max-width:85%;line-height:1.4}
+.suporteMsg.eu{background:var(--navy7);color:var(--navy);align-self:flex-end}
+.suporteMsg.ia{background:var(--red5);color:var(--navy2);align-self:flex-start}
+.suporteMsg.erro{background:var(--red5);color:var(--redD);align-self:stretch;font-size:11px}
+.suportePe{display:flex;gap:9px;padding:14px 18px;border-top:1px solid var(--navy6)}
+.suportePe input{flex:1;font-size:13.5px;padding:10px 12px;border:1px solid var(--navy6);border-radius:10px}
+.suportePe button{background:var(--red);color:var(--w);border:0;border-radius:10px;padding:10px 16px;
+  font-size:13px;font-weight:600;cursor:pointer}
+
+footer{display:none}
+
+/* ================= REDESIGN: navegação real, fotos, sem painel lateral ================= */
+
+/* wordmark de texto no topo */
+.wordHome{font-weight:800;color:var(--navy);font-size:16px;letter-spacing:-.3px}
+.wordHub{font-weight:800;color:var(--red);font-size:16px;letter-spacing:-.3px}
+
+/* corpo com espaço para a navegação inferior fixa */
+.corpoApp.comNav{padding-bottom:78px}
+
+/* ---------- navegação inferior ---------- */
+.navInferior{position:sticky;bottom:0;left:0;right:0;background:var(--w);border-top:1px solid var(--navy6);
+  display:flex;padding:6px 4px 8px;z-index:20}
+.navItem{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:5px 2px;cursor:pointer;color:var(--navy4)}
+.navItem.ativo{color:var(--red)}
+.navIcone{font-size:18px;line-height:1;position:relative}
+.navLabel{font-size:9.5px;font-weight:600}
+.navBadge{position:absolute;top:-5px;right:-8px;background:var(--red);color:var(--w);font-size:8.5px;
+  font-weight:700;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center}
+.navItem.ativo .navBadge{background:var(--navy)}
+
+/* ---------- busca no topo da home ---------- */
+.buscaTopo{display:flex;align-items:center;gap:8px;background:var(--navy7);border-radius:11px;
+  padding:11px 14px;margin-bottom:16px}
+.buscaTopo input{border:0;background:none;font-size:13.5px;color:var(--navy3);flex:1;cursor:pointer}
+
+/* ---------- hero com foto de fundo ---------- */
+.heroFoto{display:block;width:100%;text-align:left;border:0;border-radius:16px;padding:24px 18px 20px;
+  margin-bottom:22px;cursor:pointer;background-size:cover;background-position:center;min-height:230px;
+  display:flex;flex-direction:column;justify-content:flex-end}
+.heroFoto h2{color:var(--w);font-size:22px;font-weight:800;line-height:1.22;margin-bottom:8px;
+  text-shadow:0 1px 3px rgba(0,0,0,.3)}
+.heroFoto p{color:rgba(255,255,255,.88);font-size:12.5px;line-height:1.5;margin-bottom:14px;max-width:92%}
+.heroCta{color:var(--w);font-weight:700;font-size:13.5px;background:var(--red);padding:10px 16px;
+  border-radius:10px;display:inline-block;width:fit-content}
+
+.secaoTopoLinha{display:flex;justify-content:space-between;align-items:center;margin:18px 0 12px}
+.secaoTopoLinha .secaoTitulo{margin:0}
+.verTudo{background:none;border:0;color:var(--red);font-size:12px;font-weight:700;cursor:pointer}
+
+/* ---------- categorias com foto ---------- */
+.gradeCategorias{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.categoriaFoto{position:relative;border:0;border-radius:14px;height:110px;background-size:cover;
+  background-position:center;cursor:pointer;overflow:hidden;display:flex;align-items:flex-end;padding:0}
+.categoriaFoto::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(12,15,20,.72));}
+.categoriaFotoNome{position:relative;z-index:1;color:var(--w);font-size:12.5px;font-weight:700;padding:10px 12px;text-align:left}
+
+/* ---------- banner Projeto Garantido, contextual à categoria ---------- */
+.pgBanner{display:block;width:100%;text-align:left;background:#12151A;border:0;border-radius:16px;
+  padding:20px 18px;margin-bottom:20px;cursor:pointer}
+.pgTag{color:var(--red3,#FC6A62);font-size:10px;font-weight:800;letter-spacing:.6px}
+.pgBanner h3{color:var(--w);font-size:19px;font-weight:800;margin:8px 0 6px;line-height:1.25}
+.pgBanner p{color:var(--navy5);font-size:12px;line-height:1.5;margin-bottom:12px}
+.pgChips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.pgChips span{font-size:10px;color:var(--navy5);border:1px solid #3A4048;border-radius:20px;padding:4px 10px}
+
+/* ---------- grade de produtos com foto (categoria) ---------- */
+.gradeProdutos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.produtoFotoCard{background:var(--w);border:1px solid var(--navy6);border-radius:12px;overflow:hidden;
+  text-align:left;cursor:pointer;padding:0;display:flex;flex-direction:column}
+.produtoFoto{height:110px;background-size:cover;background-position:center}
+.produtoFotoInfo{padding:10px 11px 12px;display:flex;flex-direction:column;gap:3px}
+.produtoFotoCategoria{font-size:8.5px;font-weight:700;color:var(--navy4);letter-spacing:.3px}
+.produtoFotoInfo b{font-size:12px;color:var(--navy);line-height:1.3;min-height:31px}
+.produtoFotoPreco{font-size:14px;font-weight:800;color:var(--navy);margin:2px 0 6px}
+.btAdicionarMini{background:var(--navy);color:var(--w);border:0;border-radius:8px;padding:8px 6px;
+  font-size:10.5px;font-weight:700;cursor:pointer;width:100%}
+.btAdicionarMini:hover{background:#000}
+
+/* ---------- hero de produto com foto ---------- */
+.produtoHeroFoto{height:210px;border-radius:16px;background-size:cover;background-position:center;margin-bottom:16px}
+
+/* ---------- Minha Reforma: cabeçalho + timeline ---------- */
+.minhaReformaCard{background:#12151A;border-radius:16px;padding:18px 18px 20px;margin-bottom:16px}
+.mrLabel{color:var(--red3,#FC6A62);font-size:10px;font-weight:800;letter-spacing:.6px}
+.minhaReformaCard h2{color:var(--w);font-size:21px;font-weight:800;margin:6px 0 6px}
+.mrSub{display:block;color:var(--navy5);font-size:12px;margin-bottom:10px}
+.mrStatus{display:inline-block;background:var(--okBg);color:var(--ok);font-size:10.5px;font-weight:700;
+  padding:4px 11px;border-radius:20px}
+.timelineCard{background:var(--w);border:1px solid var(--navy6);border-radius:14px;padding:6px 16px;margin-bottom:16px}
+
+/* ---------- próxima etapa: sugestão sem bloqueio ---------- */
+.proximaEtapaCard{background:var(--w);border:1.5px solid var(--navy6);border-radius:14px;padding:18px;margin-bottom:20px}
+.peLabel{font-size:10px;font-weight:800;color:var(--navy4);letter-spacing:.6px}
+.proximaEtapaCard h3{font-size:17px;color:var(--navy);margin:6px 0 8px}
+.proximaEtapaCard p{font-size:12px;color:var(--navy3);line-height:1.5;margin-bottom:10px}
+.incentivoLinha{background:var(--okBg);color:var(--ok);font-size:11.5px;font-weight:600;padding:9px 12px;
+  border-radius:9px;margin-bottom:14px}
+.proximaEtapaBotoes{display:flex;flex-direction:column;gap:8px}
+
+/* ---------- Medida: escolha de caminho (foto / manual) ---------- */
+.opcaoMedida{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--w);
+  border:1.5px solid var(--navy6);border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer}
+.opcaoMedida:active{background:var(--navy7)}
+.opcaoMedidaIcone{font-size:26px;flex-shrink:0}
+.opcaoMedidaTexto{display:flex;flex-direction:column;gap:2px}
+.opcaoMedidaTexto b{font-size:13.5px;color:var(--navy)}
+.opcaoMedidaTexto span{font-size:11px;color:var(--navy4)}
+
+/* ---------- Painel interno HomeHub (priorização de expansão) ---------- */
+.painelInternoTag{background:#3D2B12;color:#F2C879;font-size:9.5px;font-weight:700;text-align:center;
+  padding:7px 10px;border-radius:8px;margin-bottom:14px;letter-spacing:.4px}
+.painelLink{color:#8A6116}
+.listaRegioes{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.regiaoCard{border:1.5px solid var(--navy6);border-radius:12px;padding:13px 14px;background:var(--w)}
+.regiaoCard.destaque{border-color:var(--ok);background:var(--okBg)}
+.regiaoCard b{font-size:13px;color:var(--navy)}
+.regiaoBadge{display:inline-block;background:var(--ok);color:var(--w);font-size:9px;font-weight:700;
+  padding:2px 9px;border-radius:20px;margin-left:8px;vertical-align:2px}
+.regiaoGrade{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.regiaoGrade div{display:flex;flex-direction:column;gap:1px}
+.regiaoGrade span{font-size:9px;color:var(--navy4)}
+.regiaoGrade b{font-size:12px;color:var(--navy2)}
