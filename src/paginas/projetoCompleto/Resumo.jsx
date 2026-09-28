@@ -18,7 +18,7 @@ export default function Resumo() {
     </AppFrame>
   );
 
-  const clienteJaMediu = app.origemMedida === "manual";
+  const clienteJaMediu = app.origemMedida === "manual" || app.origemMedida === "planta";
   const medicao = clienteJaMediu ? 0 : 180;
   const total = p.valor + p.montagem + medicao + 240;
   const d = new Date(); d.setDate(d.getDate() + p.dias - (clienteJaMediu ? 2 : 0));
@@ -36,7 +36,7 @@ export default function Resumo() {
       <div className="cartaoResumo">
         <div className="linhaResumo"><span>Móvel planejado</span><b>{brl(p.valor)}</b></div>
         {clienteJaMediu ? (
-          <div className="linhaResumo"><span>Medição profissional</span><b style={{ color: "var(--ok)" }}>Dispensada — você já mediu</b></div>
+          <div className="linhaResumo"><span>Medição profissional</span><b style={{ color: "var(--ok)" }}>Dispensada, você já mediu</b></div>
         ) : (
           <div className="linhaResumo"><span>Medição profissional</span><b>{brl(medicao)}</b></div>
         )}

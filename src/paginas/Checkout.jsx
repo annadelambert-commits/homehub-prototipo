@@ -65,7 +65,7 @@ export default function Checkout() {
       {passo === 2 && (
         <div className="formCheckout">
           <div className="cartaoResumo">
-            <div className="linhaResumo"><span>Entregar em</span><b>{form.rua}, {form.numero} — {form.cidade}/{form.uf}</b></div>
+            <div className="linhaResumo"><span>Entregar em</span><b>{form.rua}, {form.numero}, {form.cidade}/{form.uf}</b></div>
             <div className="linhaResumo total"><span>Total do pedido</span><b>{brl(app.totalCarrinho())}</b></div>
           </div>
 
@@ -85,7 +85,7 @@ export default function Checkout() {
           {app.formaPagamento === "credito" && (
             <div className="avisoCredito">
               <b>Você será direcionado a um parceiro financeiro</b>
-              <p>A HomeHub não aprova nem nega crédito — a simulação e a decisão são do parceiro.</p>
+              <p>A HomeHub não aprova nem nega crédito. A simulação e a decisão são do parceiro.</p>
             </div>
           )}
 

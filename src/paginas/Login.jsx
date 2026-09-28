@@ -20,6 +20,7 @@ export default function Login() {
         <button className="linhaMenu" onClick={() => nav("/projetos")}>Minha reforma</button>
         <button className="linhaMenu" onClick={() => nav("/carrinho")}>Meu carrinho</button>
         <button className="linhaMenu painelLink" onClick={() => nav("/painel-expansao")}>⚙ Painel HomeHub (interno)</button>
+        <button className="linhaMenu painelLink" onClick={() => nav("/ia-executiva")}>🌙 IA Executiva (interno)</button>
         <button className="linhaMenu sair" onClick={() => app.setUsuario(null)}>Sair</button>
       </AppFrame>
     );

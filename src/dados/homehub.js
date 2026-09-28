@@ -9,6 +9,7 @@ const IMG = {
   decoracao: "https://images.unsplash.com/photo-1562663474-6cbb3eaa4d14?w=800&q=75&fm=jpg&fit=crop",
   jardim: "https://images.unsplash.com/photo-1696846911635-83b97e53fb65?w=800&q=75&fm=jpg&fit=crop",
   ferramentas: "https://images.unsplash.com/photo-1645651964715-d200ce0939cc?w=800&q=75&fm=jpg&fit=crop",
+  escritorio: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800&q=75&fm=jpg&fit=crop",
 };
 
 export const CATEGORIAS = [
@@ -37,15 +38,21 @@ export const SERVICOS = [
 export const PRODUTOS = {
   "moveis-planejados": [
     { id: 1, nome: "Cozinha Compacta Faina", valor: 12680, montagem: 430, dias: 18, l: 160, p: 60, a: 75,
-      desc: "Módulos superiores e inferiores, bancada em L.", img: IMG.planejados },
+      desc: "Módulos superiores e inferiores, bancada em L.", img: IMG.planejados, tipo: "ambiente" },
     { id: 2, nome: "Cozinha Planejada Ravel", valor: 16340, montagem: 520, dias: 21, l: 180, p: 65, a: 74,
-      desc: "Armários até o teto, ilha central, iluminação embutida.", img: IMG.cozinha },
-    { id: 3, nome: "Cozinha Integrada Serra", valor: 19020, montagem: 610, dias: 24, l: 200, p: 65, a: 75,
-      desc: "Projeto completo com eletros embutidos.", img: IMG.planejados },
+      desc: "Armários até o teto, ilha central, iluminação embutida.", img: IMG.cozinha, tipo: "ambiente" },
     { id: 4, nome: "Closet Modular Vertice", valor: 8420, montagem: 380, dias: 16, l: 140, p: 60, a: 240,
-      desc: "Sistema modular do piso ao teto.", img: IMG.decoracao },
-    { id: 5, nome: "Home Office Aro", valor: 5240, montagem: 340, dias: 14, l: 120, p: 55, a: 75,
-      desc: "Bancada suspensa com passa-fios.", img: IMG.cozinha },
+      desc: "Sistema modular do piso ao teto.", img: IMG.decoracao, tipo: "movel" },
+    { id: 5, nome: "Escrivaninha Home Office Aro", valor: 2840, montagem: 220, dias: 10, l: 120, p: 55, a: 75,
+      desc: "Bancada suspensa com passa-fios, para home office.", img: IMG.escritorio, tipo: "movel" },
+    { id: 6, nome: "Mesa de Jantar Planejada Cedro", valor: 4980, montagem: 260, dias: 12, l: 180, p: 90, a: 76,
+      desc: "Tampo em madeira maciça sob medida, 6 a 8 lugares.", img: IMG.decoracao, tipo: "movel" },
+    { id: 7, nome: "Rack de TV Planejado Horizonte", valor: 3260, montagem: 210, dias: 9, l: 220, p: 40, a: 45,
+      desc: "Painel suspenso com nicho para TV e som.", img: IMG.planejados, tipo: "movel" },
+    { id: 8, nome: "Estante Modular Aberta Trama", valor: 3890, montagem: 240, dias: 11, l: 200, p: 35, a: 220,
+      desc: "Do piso ao teto, nichos configuráveis, sem portas.", img: IMG.decoracao, tipo: "movel" },
+    { id: 9, nome: "Painel Ripado para TV", valor: 2450, montagem: 190, dias: 9, l: 240, p: 20, a: 200,
+      desc: "Ripas em madeira com iluminação embutida atrás da TV.", img: IMG.planejados, tipo: "movel" },
   ],
   "cozinha": [
     { id: 20, nome: "Panelas Tramontina Set 5pç", valor: 890, desc: "Antiaderente, indução.", img: IMG.cozinha },
@@ -109,7 +116,7 @@ export const PROJETOS_REFORMA = [
     resumo: "Categoria de maior ticket médio (R$ 14.622) e maior margem (48,1%) da base.",
     orcamentoSugerido: 20000 },
   { id: "banheiro", nome: "Banheiro", status: "sugerido",
-    resumo: "Próximo ambiente sugerido pela IA — você pode começar quando quiser.",
+    resumo: "Próximo ambiente sugerido pela IA. Você pode começar quando quiser.",
     orcamentoSugerido: 8000 },
   { id: "sala", nome: "Sala de estar", status: "planejado",
     resumo: "Terceira etapa do plano de reforma, ainda não iniciada.",

@@ -50,6 +50,15 @@ que essa região, citando os números que pesaram a favor e algum risco a monito
 "alternativas":[{"regiao":"nome","motivo":"uma frase curta do motivo de ter ficado atrás"}]}
 O array "alternativas" deve ter exatamente 2 itens, as duas próximas melhores opções.`;
 
+const PROMPT_EXECUTIVO = `Você é a IA executiva interna da HomeHub, uma rede de produtos para casa, decoração e reforma.
+Responde perguntas livres do time interno sobre o negócio (números, regiões, funil de Reforma em Etapas, priorização),
+usando os dados de contexto fornecidos. Seja direto e objetivo, em português, em no máximo 5 frases.
+
+Se a pergunta pedir algo que os dados de contexto não cobrem, diga isso claramente em vez de inventar números.
+Você não substitui relatórios financeiros formais nem decide sozinha ações de negócio, apenas apoia a análise.
+
+Responda apenas em texto simples, sem markdown, sem JSON.`;
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Método não permitido, use POST." };
@@ -70,7 +79,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ erro: "Corpo da requisição não é um JSON válido." }) };
   }
 
-  const { modo, mensagem, historico, regioes } = payload;
+  const { modo, mensagem, historico, regioes, contexto } = payload;
   if (!modo) {
     return { statusCode: 400, body: JSON.stringify({ erro: "Falta o campo: modo." }) };
   }
@@ -81,7 +90,11 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ erro: "Falta o campo: regioes (array não vazio)." }) };
   }
 
-  const systemPrompt = modo === "concierge" ? PROMPT_CONCIERGE : modo === "expansao" ? PROMPT_EXPANSAO : modo === "design" ? PROMPT_DESIGN : PROMPT_SUPORTE;
+  const systemPrompt = modo === "concierge" ? PROMPT_CONCIERGE
+    : modo === "expansao" ? PROMPT_EXPANSAO
+    : modo === "design" ? PROMPT_DESIGN
+    : modo === "executivo" ? PROMPT_EXECUTIVO + (contexto ? `\n\nDados internos disponíveis:\n${contexto}` : "")
+    : PROMPT_SUPORTE;
   const messages = modo === "expansao"
     ? [{ role: "user", content: JSON.stringify(regioes) }]
     : [...(Array.isArray(historico) ? historico.slice(-6) : []), { role: "user", content: mensagem }];

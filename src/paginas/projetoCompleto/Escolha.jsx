@@ -13,19 +13,22 @@ export default function Escolha() {
 
   return (
     <AppFrame titulo="Projeto Completo" comNavInferior={false}>
-      <div className="passoIndicador"><i className="feito" /><i className="feito" /><i className="ativo" /><i /></div>
+      <div className="passoIndicador"><i className="feito" /><i className="feito" /><i className="ativo" /><i /><i /></div>
       <h2 className="tituloTela">{vao ? `O que cabe no seu vão de ${vao} cm` : "Escolha o projeto"}</h2>
-      {!vao && <div className="cartao alerta"><p>Sem medida ainda — volte à etapa anterior. Mostrando o catálogo completo.</p></div>}
+      {!vao && <div className="cartao alerta"><p>Medida exata ainda pendente de validação. Mostrando o catálogo completo.</p></div>}
 
       {catalogo.map((p) => {
         const cabe = !vao || p.l <= vao;
         return (
           <button key={p.id} className={"produtoCard largo" + (app.produtoAtual?.id === p.id ? " sel" : "")}
             disabled={!cabe} onClick={() => app.setProdutoAtual(p)}>
-            <div className="produtoImg">{p.img}</div>
+            <div className="produtoImg foto" style={{ backgroundImage: `url(${p.img})` }} />
             <div className="produtoInfo">
+              <span className={"tagCabe " + (p.tipo === "ambiente" ? "amb" : "mov")} style={{ marginTop: 0, marginBottom: 2 }}>
+                {p.tipo === "ambiente" ? "ambiente completo" : "móvel"}
+              </span>
               <b>{p.nome}</b>
-              <span className="produtoDesc">{p.l} × {p.p} × {p.a} cm — {p.desc}</span>
+              <span className="produtoDesc">{p.l} × {p.p} × {p.a} cm. {p.desc}</span>
               <span className="produtoPreco">{brl0(p.valor)}</span>
               {vao && <span className={"tagCabe " + (cabe ? "sim" : "nao")}>{cabe ? `cabe, sobram ${vao - p.l} cm` : `não cabe`}</span>}
             </div>

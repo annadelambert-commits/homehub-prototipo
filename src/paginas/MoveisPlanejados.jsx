@@ -38,10 +38,17 @@ export default function MoveisPlanejados() {
       app.setAnalise(dados); app.setOrigemMedida("ia");
       setPasso(PASSO.MEDIDO);
     } catch {
-      app.setErroAnalise("Não foi possível analisar agora. Verifique a ANTHROPIC_API_KEY — ou use a análise de demonstração.");
+      app.setErroAnalise("Não foi possível analisar agora. Confira a chave da API no Netlify, ou use a análise de demonstração.");
     } finally { setCarregando(false); }
   }
   function usarDemo() { app.setAnalise(ANALISE_DEMO); app.setOrigemMedida("demo"); setPasso(PASSO.MEDIDO); }
+
+  function confirmarComPlanta() {
+    // a planta já é suficiente pra seguir; medidas exatas ficam pra validação técnica
+    app.setAnalise(null);
+    app.setOrigemMedida("planta");
+    setPasso(PASSO.MEDIDO);
+  }
 
   function confirmarManual() {
     if (!medidas.largura || !medidas.altura) return;
@@ -55,9 +62,9 @@ export default function MoveisPlanejados() {
   }
 
   function confirmarPlanta() {
-    // planta enviada, mas ainda precisa das medidas principais
-    if (!medidas.largura || !medidas.altura) { setPasso(PASSO.MANUAL); return; }
-    confirmarManual();
+    // a planta sozinha já é suficiente; medidas digitadas são opcionais, só refinam
+    if (medidas.largura && medidas.altura) { confirmarManual(); return; }
+    confirmarComPlanta();
   }
 
   function solicitarOrcamento() {
@@ -73,7 +80,7 @@ export default function MoveisPlanejados() {
       {passo === PASSO.INTRO && (
         <>
           <h2 className="tituloTela">Vamos medir seu ambiente</h2>
-          <p className="subtituloTela">Móveis planejados são feitos sob medida. A maioria das dúvidas some quando o ambiente é medido certo — escolha como prefere fazer.</p>
+          <p className="subtituloTela">Móveis planejados são feitos sob medida. Escolha como prefere medir o ambiente.</p>
 
           <button className="opcaoMedida" onClick={() => setPasso(PASSO.FOTO)}>
             <span className="opcaoMedidaIcone">📷</span>
@@ -123,21 +130,21 @@ export default function MoveisPlanejados() {
       {passo === PASSO.PLANTA && (
         <>
           <h2 className="tituloTela">Envie a planta do ambiente</h2>
-          <p className="subtituloTela">Como você já tem a planta, a HomeHub não precisa mandar um técnico medir — isso vira desconto no orçamento.</p>
+          <p className="subtituloTela">Como você já tem a planta, a HomeHub não precisa mandar um técnico medir. Isso vira desconto no orçamento.</p>
           {app.plantaImagem && <img className="prevImg" src={app.plantaImagem} alt="Planta" />}
           <label className="soltaArquivo">
             <b>{app.plantaImagem ? "Trocar planta" : "Enviar planta baixa"}</b>
             <span>Imagem ou PDF</span>
             <input type="file" accept="image/*,.pdf" style={{ display: "none" }} onChange={(e) => onArquivo(e, "planta")} />
           </label>
-          <label className="rotuloSecao">Medidas do ambiente (cm)</label>
+          <label className="rotuloSecao">Medidas do ambiente (cm), opcional</label>
           <div className="linhaMedidas">
             <input type="number" placeholder="Largura" value={medidas.largura} onChange={(e) => setMedidas({ ...medidas, largura: e.target.value })} />
             <input type="number" placeholder="Profund." value={medidas.profundidade} onChange={(e) => setMedidas({ ...medidas, profundidade: e.target.value })} />
             <input type="number" placeholder="Pé-direito" value={medidas.altura} onChange={(e) => setMedidas({ ...medidas, altura: e.target.value })} />
           </div>
           <div className="ctaFixo">
-            <button className="btPrimario" disabled={!medidas.largura || !medidas.altura} onClick={confirmarPlanta}>Continuar</button>
+            <button className="btPrimario" disabled={!app.plantaImagem} onClick={confirmarPlanta}>Continuar</button>
           </div>
         </>
       )}
@@ -158,16 +165,22 @@ export default function MoveisPlanejados() {
         </>
       )}
 
-      {passo === PASSO.MEDIDO && a && (
+      {passo === PASSO.MEDIDO && (a || app.origemMedida === "planta") && (
         <>
-          <h2 className="tituloTela">Ambiente medido {app.origemMedida === "ia" ? <span className="tagIA">IA de visão</span> : app.origemMedida === "demo" ? <span className="tagCalc">demonstração</span> : <span className="tagCalc">informado por você</span>}</h2>
-          <div className="cartaoResumo">
-            <div className="linhaResumo"><span>Largura</span><b>{a.largura} cm</b></div>
-            <div className="linhaResumo"><span>Profundidade</span><b>{a.profundidade} cm</b></div>
-            <div className="linhaResumo"><span>Pé-direito</span><b>{a.altura} cm</b></div>
-          </div>
-          {app.origemMedida === "manual" && (
-            <div className="cartao bom"><h4>Sem custo de visita técnica</h4><p>Você informou as medidas — a taxa de medição não entra no orçamento.</p></div>
+          <h2 className="tituloTela">Ambiente medido {app.origemMedida === "ia" ? <span className="tagIA">IA de visão</span> : app.origemMedida === "demo" ? <span className="tagCalc">demonstração</span> : app.origemMedida === "planta" ? <span className="tagCalc">pela planta enviada</span> : <span className="tagCalc">informado por você</span>}</h2>
+          {a ? (
+            <div className="cartaoResumo">
+              <div className="linhaResumo"><span>Largura</span><b>{a.largura} cm</b></div>
+              <div className="linhaResumo"><span>Profundidade</span><b>{a.profundidade} cm</b></div>
+              <div className="linhaResumo"><span>Pé-direito</span><b>{a.altura} cm</b></div>
+            </div>
+          ) : (
+            <div className="cartaoResumo">
+              <div className="linhaResumo"><span>Planta baixa</span><b>Recebida</b></div>
+            </div>
+          )}
+          {(app.origemMedida === "manual" || app.origemMedida === "planta") && (
+            <div className="cartao bom"><h4>Sem custo de visita técnica</h4><p>Você já enviou a medida (planta ou digitada). A taxa de medição não entra no orçamento.</p></div>
           )}
           <div className="cartao">
             <h4>Próximo passo: seu orçamento sob medida</h4>

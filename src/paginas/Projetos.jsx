@@ -47,7 +47,7 @@ export default function Projetos() {
         <div className="proximaEtapaCard">
           <span className="peLabel">PRÓXIMA ETAPA SUGERIDA</span>
           <h3>{proxima.nome}</h3>
-          <p>Quando quiser, sua jornada pode continuar sem começar do zero — o escopo, o estilo e as medidas já
+          <p>Quando quiser, sua jornada pode continuar sem começar do zero. O escopo, o estilo e as medidas já
           ficam registrados no seu perfil.</p>
           <div className="incentivoLinha">🏷️ {INCENTIVO_FASEADO.texto}</div>
           <div className="proximaEtapaBotoes">
@@ -58,7 +58,7 @@ export default function Projetos() {
       )}
 
       <h3 className="secaoTitulo">Todos os ambientes</h3>
-      <p className="subtituloTela" style={{ marginTop: -6 }}>Escolha livremente por onde continuar — não há ordem obrigatória.</p>
+      <p className="subtituloTela" style={{ marginTop: -6 }}>Escolha livremente por onde continuar. Não há ordem obrigatória.</p>
       {app.projetos.map((p) => (
         <button key={p.id} className={"projetoCard " + p.status} onClick={() => irParaProjeto(p.id)}>
           <div className="projetoTopo">

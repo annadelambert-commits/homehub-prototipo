@@ -12,6 +12,8 @@ import Projetos from "./paginas/Projetos";
 import PainelExpansao from "./paginas/PainelExpansao";
 import Design from "./paginas/Design";
 import MoveisPlanejados from "./paginas/MoveisPlanejados";
+import Busca from "./paginas/Busca";
+import IAExecutiva from "./paginas/IAExecutiva";
 import Concierge from "./paginas/projetoCompleto/Concierge";
 import Medida from "./paginas/projetoCompleto/Medida";
 import Escolha from "./paginas/projetoCompleto/Escolha";
@@ -34,6 +36,8 @@ export default function App() {
           <Route path="/painel-expansao" element={<PainelExpansao />} />
           <Route path="/design" element={<Design />} />
           <Route path="/moveis-planejados" element={<MoveisPlanejados />} />
+          <Route path="/busca" element={<Busca />} />
+          <Route path="/ia-executiva" element={<IAExecutiva />} />
           <Route path="/projeto-completo" element={<Concierge />} />
           <Route path="/projeto-completo/medida" element={<Medida />} />
           <Route path="/projeto-completo/escolha" element={<Escolha />} />

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppFrame from "../componentes/AppFrame";
 import { CATEGORIAS, SERVICOS, IMG_HERO } from "../dados/homehub";
@@ -5,19 +6,27 @@ import { CATEGORIAS, SERVICOS, IMG_HERO } from "../dados/homehub";
 export default function Home() {
   const nav = useNavigate();
   const destaque = CATEGORIAS.slice(0, 6);
+  const [busca, setBusca] = useState("");
+
+  function irParaBusca(e) {
+    e.preventDefault();
+    if (busca.trim()) nav(`/busca?q=${encodeURIComponent(busca.trim())}`);
+    else nav("/categorias");
+  }
 
   return (
     <AppFrame titulo="" voltar={false}>
-      <div className="buscaTopo">
+      <form className="buscaTopo" onSubmit={irParaBusca}>
         <span>🔍</span>
-        <input type="text" placeholder="Buscar produtos, ambientes ou soluções" readOnly
-          onClick={() => nav("/categorias")} />
-      </div>
+        <input type="text" placeholder="Buscar produtos, ambientes ou soluções"
+          value={busca} onChange={(e) => setBusca(e.target.value)} />
+        {busca && <button type="submit" className="buscaTopoBt">Buscar</button>}
+      </form>
 
       <button className="heroFoto" style={{ backgroundImage: `linear-gradient(180deg, rgba(12,15,20,.35), rgba(12,15,20,.82)), url(${IMG_HERO})` }}
         onClick={() => nav("/projeto-completo")}>
         <h2>Sua reforma. Do projeto à execução.</h2>
-        <p>Planeje, compre e acompanhe sua reforma em um só lugar — com escopo, produtos, serviços e execução coordenados.</p>
+        <p>Planeje, compre e acompanhe sua reforma em um só lugar, com escopo, produtos, serviços e execução coordenados. Sai mais em conta fazer completa, mesmo em etapas.</p>
         <span className="heroCta">Começar meu projeto →</span>
       </button>
 
@@ -25,7 +34,7 @@ export default function Home() {
         <div className="cardDesignTag">✨ NOVO · IA DE DESIGN</div>
         <div className="cardDesignTxt">
           <b>Não sabe por onde começar?</b>
-          <span>Fotografe o ambiente, escolha um estilo e a IA projeta sua reforma — com tudo que você precisa para realizá-la.</span>
+          <span>Fotografe o ambiente, escolha um estilo e a IA projeta sua reforma, com tudo que você precisa para realizá-la.</span>
         </div>
       </button>
 

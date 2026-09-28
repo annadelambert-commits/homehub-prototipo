@@ -69,6 +69,9 @@ button,input,select,textarea{font-family:inherit}
 .produtoCard.largo{align-items:flex-start}
 .produtoImg{font-size:30px;width:56px;height:56px;background:var(--navy7);border-radius:10px;
   display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.produtoImg.foto{background-size:cover;background-position:center}
+.tagCabe.amb{background:var(--navy7);color:var(--navy2)}
+.tagCabe.mov{background:#EAF0F2;color:#2E4550}
 .produtoInfo{display:flex;flex-direction:column;gap:2px;min-width:0}
 .produtoInfo b{font-size:13.5px;color:var(--navy)}
 .produtoDesc{font-size:11px;color:var(--navy4);line-height:1.3}
@@ -247,7 +250,16 @@ footer{display:none}
 /* ---------- busca no topo da home ---------- */
 .buscaTopo{display:flex;align-items:center;gap:8px;background:var(--navy7);border-radius:11px;
   padding:11px 14px;margin-bottom:16px}
-.buscaTopo input{border:0;background:none;font-size:13.5px;color:var(--navy3);flex:1;cursor:pointer}
+.buscaTopo input{border:0;background:none;font-size:13.5px;color:var(--navy);flex:1}
+.buscaTopo input::placeholder{color:var(--navy4)}
+.buscaTopoBt{background:var(--red);color:var(--w);border:0;border-radius:8px;padding:7px 12px;
+  font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
+
+/* ---------- escolha de ambiente (Projeto Completo) ---------- */
+.gradeAmbientes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.ambienteChip{background:var(--w);border:1.5px solid var(--navy6);border-radius:20px;padding:10px 16px;
+  font-size:13px;font-weight:600;color:var(--navy2);cursor:pointer}
+.ambienteChip:active{background:var(--red5);border-color:var(--red4);color:var(--redD)}
 
 /* ---------- hero com foto de fundo ---------- */
 .heroFoto{display:block;width:100%;text-align:left;border:0;border-radius:16px;padding:24px 18px 20px;
@@ -378,3 +390,32 @@ footer{display:none}
 .linhaMedidas{display:flex;gap:8px}
 .linhaMedidas input{flex:1;font-size:15px;padding:10px 11px;border:1px solid var(--navy6);border-radius:8px;width:100%}
 .inputCheio{width:100%;font-size:16px;padding:11px 13px;border:1px solid var(--navy6);border-radius:8px;margin-bottom:4px}
+
+/* ---------- IA Executiva: reaproveita estilos do suporte, em tela cheia ---------- */
+.iaExecCorpo{border:1px solid var(--navy6);border-radius:14px;padding:14px;min-height:220px;margin-bottom:4px}
+.iaExecPe{border-top:none}
+
+/* ================= modo escuro (IA Executiva, uso interno) ================= */
+body[data-theme="dark"]{background:#0B0E13;color:#EDEFF2}
+body[data-theme="dark"] .telaApp{background:#12151A;box-shadow:0 0 40px rgba(0,0,0,.55)}
+body[data-theme="dark"] .topoApp{background:#12151A;border-bottom-color:#262B33}
+body[data-theme="dark"] .tituloTopo,body[data-theme="dark"] .iconeTopo,body[data-theme="dark"] .marcaTopo .wordHome{color:#EDEFF2}
+body[data-theme="dark"] .navInferior{background:#12151A;border-top-color:#262B33}
+body[data-theme="dark"] .navItem{color:#7A8394}
+body[data-theme="dark"] .tituloTela,body[data-theme="dark"] h2,body[data-theme="dark"] h3,body[data-theme="dark"] h4{color:#EDEFF2}
+body[data-theme="dark"] .subtituloTela{color:#8890A0}
+body[data-theme="dark"] .cartao{background:#171B22;border-color:#262B33}
+body[data-theme="dark"] .cartao p{color:#AEB6C2}
+body[data-theme="dark"] .cartao.bom{background:#122018;border-color:#254433}
+body[data-theme="dark"] .cartaoResumo{background:#171B22}
+body[data-theme="dark"] .linhaResumo{color:#AEB6C2;border-bottom-color:#262B33}
+body[data-theme="dark"] .linhaResumo b{color:#EDEFF2}
+body[data-theme="dark"] .chatInput,body[data-theme="dark"] input,body[data-theme="dark"] select,body[data-theme="dark"] textarea{
+  background:#171B22;border-color:#262B33;color:#EDEFF2}
+body[data-theme="dark"] .btSecundario{background:#171B22;border-color:#262B33;color:#EDEFF2}
+body[data-theme="dark"] .ctaFixo{background:#12151A;border-top-color:#262B33}
+body[data-theme="dark"] .painelInternoTag{background:#1E2A3D;color:#8FB4E6}
+body[data-theme="dark"] .iaExecCorpo{border-color:#262B33}
+body[data-theme="dark"] .suporteMsg.eu{background:#1E2430;color:#EDEFF2}
+body[data-theme="dark"] .suporteMsg.ia{background:#2A1A22;color:#F0C9CE}
+body[data-theme="dark"] .suporteVazio{color:#7A8394}

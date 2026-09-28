@@ -11,7 +11,7 @@ export default function Medida() {
   const app = useApp();
   const [carregando, setCarregando] = useState(false);
   const [caminho, setCaminho] = useState(app.analise ? CAMINHOS.FOTO : CAMINHOS.ESCOLHA);
-  const [vaoDigitado, setVaoDigitado] = useState("");
+  const [medidas, setMedidas] = useState({ largura: "", profundidade: "", altura: "" });
 
   function onArquivo(e) {
     const f = e.target.files[0];
@@ -43,7 +43,7 @@ export default function Medida() {
       if (!Array.isArray(dados.obstrucoes)) dados.obstrucoes = [String(dados.obstrucoes || "nenhuma identificada")];
       app.setAnalise(dados); app.setModoDemo(false); app.setOrigemMedida("ia");
     } catch (e) {
-      app.setErroAnalise(e.message + " O protótipo depende de conexão com o modelo de visão.");
+      app.setErroAnalise(e.message + ". O protótipo depende de conexão com o modelo de visão.");
     } finally {
       setCarregando(false);
     }
@@ -51,60 +51,80 @@ export default function Medida() {
 
   function usarDemo() { app.setAnalise(ANALISE_DEMO); app.setModoDemo(true); app.setErroAnalise(null); app.setOrigemMedida("demo"); }
 
-  function confirmarManual() {
-    const v = Number(vaoDigitado);
+  function confirmarComMedidas() {
+    const v = Number(medidas.largura);
     if (!v || v < 30) return;
-    app.setMedidaManual(v); app.setOrigemMedida("manual");
+    app.setMedidaManual({
+      largura: v,
+      profundidade: Number(medidas.profundidade) || null,
+      altura: Number(medidas.altura) || null,
+    });
+    app.setOrigemMedida("manual");
   }
 
-  // ---- tela de escolha entre os três caminhos ----
+  function confirmarComPlanta() {
+    // planta é suficiente por si só: segue sem medidas digitadas, validação fica pra depois
+    app.setMedidaManual(null);
+    app.setOrigemMedida("planta");
+  }
+
+  // ---- tela de escolha entre os dois caminhos ----
   if (caminho === CAMINHOS.ESCOLHA) {
     return (
       <AppFrame titulo="Projeto Completo" comNavInferior={false}>
-        <div className="passoIndicador"><i className="feito" /><i className="ativo" /><i /><i /></div>
+        <div className="passoIndicador"><i className="feito" /><i className="ativo" /><i /><i /><i /></div>
         <h2 className="tituloTela">Como você quer medir o espaço?</h2>
-        <p className="subtituloTela">Escolha o caminho mais rápido para você — os dois primeiros usam IA real.</p>
+        <p className="subtituloTela">Escolha o caminho mais rápido pra você. Os dois primeiros usam IA real.</p>
 
         <button className="opcaoMedida" onClick={() => setCaminho(CAMINHOS.FOTO)}>
           <span className="opcaoMedidaIcone">📷</span>
-          <span className="opcaoMedidaTexto"><b>Fotografar o ambiente</b><span>IA de visão estima o vão pela foto</span></span>
+          <span className="opcaoMedidaTexto"><b>Fotografar o ambiente</b><span>IA de visão estima as medidas pela foto</span></span>
         </button>
         <button className="opcaoMedida" onClick={() => setCaminho(CAMINHOS.MANUAL)}>
           <span className="opcaoMedidaIcone">📐</span>
-          <span className="opcaoMedidaTexto"><b>Já tenho as medidas</b><span>Planta baixa ou medição já feita — sem visita técnica</span></span>
+          <span className="opcaoMedidaTexto"><b>Já tenho as medidas</b><span>Planta baixa ou medição já feita, sem visita técnica</span></span>
         </button>
       </AppFrame>
     );
   }
 
-  // ---- caminho manual: planta ou número direto ----
-  if (caminho === CAMINHOS.MANUAL && !app.medidaManual) {
+  // ---- caminho manual: planta e/ou medidas do ambiente completo ----
+  if (caminho === CAMINHOS.MANUAL && app.origemMedida !== "manual" && app.origemMedida !== "planta") {
+    const podeConfirmarComMedidas = medidas.largura && Number(medidas.largura) >= 30;
     return (
       <AppFrame titulo="Projeto Completo" voltar={() => setCaminho(CAMINHOS.ESCOLHA)} comNavInferior={false}>
-        <div className="passoIndicador"><i className="feito" /><i className="ativo" /><i /><i /></div>
+        <div className="passoIndicador"><i className="feito" /><i className="ativo" /><i /><i /><i /></div>
         <h2 className="tituloTela">Já tenho as medidas</h2>
-        <p className="subtituloTela">Envie a planta baixa, se tiver (opcional, só para registro no projeto), e digite o vão disponível para o móvel.</p>
+        <p className="subtituloTela">Envie a planta baixa do ambiente completo (ela já é suficiente pra continuar) e, se quiser, complemente com as medidas.</p>
 
         {app.plantaImagem && <img className="prevImg" src={app.plantaImagem} alt="Planta enviada" />}
         <label className="soltaArquivo">
-          <b>{app.plantaImagem ? "Trocar planta" : "Enviar planta baixa (opcional)"}</b>
+          <b>{app.plantaImagem ? "Trocar planta" : "Enviar planta baixa"}</b>
           <span>Toque para escolher uma imagem ou PDF</span>
           <input type="file" accept="image/*,.pdf" style={{ display: "none" }} onChange={onPlanta} />
         </label>
 
-        <label className="rotuloSecao">Vão disponível para o móvel (cm)</label>
-        <input type="number" placeholder="Ex.: 284" value={vaoDigitado}
-          onChange={(e) => setVaoDigitado(e.target.value)}
-          style={{ width: "100%", fontSize: 16, padding: "12px 14px", border: "1px solid var(--navy6)", borderRadius: 10 }} />
+        {app.plantaImagem && (
+          <div className="ctaFixo" style={{ marginTop: 0, borderTop: "none" }}>
+            <button className="btPrimario" onClick={confirmarComPlanta}>Continuar com a planta enviada</button>
+          </div>
+        )}
+
+        <label className="rotuloSecao" style={{ marginTop: 18 }}>Medidas do ambiente completo (cm), opcional</label>
+        <div className="linhaMedidas">
+          <input type="number" placeholder="Largura" value={medidas.largura} onChange={(e) => setMedidas({ ...medidas, largura: e.target.value })} />
+          <input type="number" placeholder="Profund." value={medidas.profundidade} onChange={(e) => setMedidas({ ...medidas, profundidade: e.target.value })} />
+          <input type="number" placeholder="Pé-direito" value={medidas.altura} onChange={(e) => setMedidas({ ...medidas, altura: e.target.value })} />
+        </div>
 
         <div className="cartao bom" style={{ marginTop: 14 }}>
           <h4>Desconto pela visita técnica evitada</h4>
-          <p>Como você já tem a medida, a HomeHub não precisa enviar um técnico — o valor da medição profissional sai do orçamento.</p>
+          <p>Como você já tem a medida (pela planta ou digitada), a HomeHub não precisa enviar um técnico. O valor da medição profissional sai do orçamento.</p>
         </div>
 
         <div className="ctaFixo">
-          <button className="btPrimario" disabled={!vaoDigitado || Number(vaoDigitado) < 30} onClick={confirmarManual}>
-            Confirmar medida
+          <button className="btPrimario" disabled={!podeConfirmarComMedidas} onClick={confirmarComMedidas}>
+            Confirmar medidas digitadas
           </button>
         </div>
       </AppFrame>
@@ -112,19 +132,28 @@ export default function Medida() {
   }
 
   // ---- caminho manual já confirmado: resumo, segue pro catálogo ----
-  if (caminho === CAMINHOS.MANUAL && app.medidaManual) {
+  if (caminho === CAMINHOS.MANUAL && (app.origemMedida === "manual" || app.origemMedida === "planta")) {
+    const m = app.medidaManual;
     return (
       <AppFrame titulo="Projeto Completo" comNavInferior={false}>
-        <div className="passoIndicador"><i className="feito" /><i className="feito" /><i /><i /></div>
-        <h2 className="tituloTela">Medida confirmada <span className="tagCalc">informada por você</span></h2>
+        <div className="passoIndicador"><i className="feito" /><i className="feito" /><i /><i /><i /></div>
+        <h2 className="tituloTela">Medida confirmada <span className="tagCalc">{m ? "informada por você" : "pela planta enviada"}</span></h2>
         <div className="cartaoResumo">
-          <div className="linhaResumo total"><span>Vão informado</span><b>{app.medidaManual} cm</b></div>
+          {m ? (
+            <>
+              <div className="linhaResumo total"><span>Largura</span><b>{m.largura} cm</b></div>
+              {m.profundidade && <div className="linhaResumo"><span>Profundidade</span><b>{m.profundidade} cm</b></div>}
+              {m.altura && <div className="linhaResumo"><span>Pé-direito</span><b>{m.altura} cm</b></div>}
+            </>
+          ) : (
+            <div className="linhaResumo"><span>Planta baixa</span><b>Recebida</b></div>
+          )}
         </div>
         <div className="cartao bom"><h4>Sem custo de visita técnica</h4>
-          <p>O orçamento no próximo passo já sai sem a taxa de medição profissional.</p></div>
+          <p>O orçamento no próximo passo já sai sem a taxa de medição profissional. {!m && "As medidas exatas são confirmadas a partir da planta na validação técnica."}</p></div>
         <div className="ctaFixo">
           <button className="btPrimario" onClick={() => nav("/projeto-completo/escolha")}>Continuar</button>
-          <button className="btSecundario" onClick={() => { app.setMedidaManual(null); app.setOrigemMedida(null); setVaoDigitado(""); }}>Corrigir medida</button>
+          <button className="btSecundario" onClick={() => { app.setMedidaManual(null); app.setOrigemMedida(null); setMedidas({ largura: "", profundidade: "", altura: "" }); }}>Corrigir medida</button>
         </div>
       </AppFrame>
     );
@@ -133,7 +162,7 @@ export default function Medida() {
   // ---- caminho da foto com IA de visão ----
   return (
     <AppFrame titulo="Projeto Completo" voltar={() => setCaminho(CAMINHOS.ESCOLHA)} comNavInferior={false}>
-      <div className="passoIndicador"><i className="feito" /><i className="ativo" /><i /><i /></div>
+      <div className="passoIndicador"><i className="feito" /><i className="ativo" /><i /><i /><i /></div>
       <h2 className="tituloTela">Fotografe o espaço</h2>
 
       {!app.analise && !carregando && !app.erroAnalise && (
@@ -176,7 +205,7 @@ export default function Medida() {
             <div className="linhaResumo total"><span>Vão aproveitável</span><b>{app.analise.vao} cm</b></div>
           </div>
           <div className="cartao alerta"><h4>Precisão declarada</h4>
-            <p>Confiança {app.analise.confianca}. Estimativa de ordem centimétrica — a medição profissional segue existindo na execução.</p></div>
+            <p>Confiança {app.analise.confianca}. Estimativa de ordem centimétrica, a medição profissional segue existindo na execução.</p></div>
           <div className="ctaFixo">
             <button className="btPrimario" onClick={() => nav("/projeto-completo/escolha")}>Continuar</button>
           </div>

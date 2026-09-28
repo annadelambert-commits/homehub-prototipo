@@ -39,7 +39,7 @@ export default function Design() {
       app.setDesignResultado({ render: renderPorEstilo(app.designEstilo), resumo: dados.resumo, destaques: dados.destaques || [] });
       setPasso(PASSO.RESULTADO);
     } catch {
-      app.setDesignErro("Não foi possível gerar o texto do projeto agora. Verifique a ANTHROPIC_API_KEY — ou use o exemplo pronto.");
+      app.setDesignErro("Não foi possível gerar o texto do projeto agora. Confira a chave da API no Netlify, ou use o exemplo pronto.");
       setPasso(PASSO.ESTILO);
     }
   }
@@ -64,7 +64,7 @@ export default function Design() {
 
   function adicionarProjetoAoCarrinho() {
     app.adicionarAoCarrinho({
-      nome: "Projeto de Ambientação (IA de Design) — pacote completo",
+      nome: "Projeto de Ambientação (IA de Design), pacote completo",
       valor: totalComDesconto, montagem: 0, categoriaId: "design",
     });
     nav("/carrinho");
@@ -140,7 +140,7 @@ export default function Design() {
           <h2 className="tituloTela">Seu novo ambiente</h2>
           <div className="renderBox">
             <img src={app.designResultado.render} alt="Ambiente reformado" />
-            <span className="renderTag">demonstração — geração ao vivo depende de integração com modelo de imagem</span>
+            <span className="renderTag">demonstração, geração ao vivo depende de integração com modelo de imagem</span>
           </div>
           <div className="cartao bom" style={{ marginTop: 12 }}>
             <p>{app.designResultado.resumo}</p>
@@ -154,7 +154,7 @@ export default function Design() {
             </div>
           )}
           <div className="ctaFixo">
-            <button className="btPrimario" onClick={() => setPasso(PASSO.PROJETO)}>Gostei — abrir o projeto e ver o que preciso</button>
+            <button className="btPrimario" onClick={() => setPasso(PASSO.PROJETO)}>Gostei, abrir o projeto e ver o que preciso</button>
             <button className="btSecundario" onClick={() => setPasso(PASSO.ESTILO)}>Tentar outro estilo</button>
           </div>
         </>
@@ -183,7 +183,7 @@ export default function Design() {
             <div className="linhaResumo total"><span>Preço do pacote completo</span><b>{brl(totalComDesconto)}</b></div>
           </div>
           <div className="cartao bom"><h4>Preço fechado, protegido contra surpresa</h4>
-            <p>Você trava esse valor agora — produto, material, móveis e mão de obra. Sem custo que aparece no meio da obra.</p></div>
+            <p>Você trava esse valor agora: produto, material, móveis e mão de obra. Sem custo que aparece no meio da obra.</p></div>
           <div className="ctaFixo">
             <button className="btPrimario" onClick={adicionarProjetoAoCarrinho}>Adicionar pacote ao carrinho · {brl(totalComDesconto)}</button>
             <button className="btSecundario" onClick={fazerPorEtapas}>Prefiro fazer por etapas</button>

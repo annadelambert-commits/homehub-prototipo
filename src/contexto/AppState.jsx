@@ -19,6 +19,8 @@ export function AppProvider({ children }) {
   // Concierge (IA texto)
   const [briefing, setBriefing] = useState(null);
   const [erroConcierge, setErroConcierge] = useState(null);
+  const [ambienteEscolhido, setAmbienteEscolhido] = useState(null);
+  const [reformaCompleta, setReformaCompleta] = useState(false);
 
   // IA de Design / Render
   const [designFoto, setDesignFoto] = useState(null);
@@ -56,7 +58,7 @@ export function AppProvider({ children }) {
     return carrinho.reduce((s, i) => s + (i.valor || 0) + (i.montagem || 0), 0);
   }
   function vaoUtil() {
-    if (medidaManual) return medidaManual;
+    if (medidaManual) return typeof medidaManual === "object" ? medidaManual.largura : medidaManual;
     if (analise) return analise.vao;
     return null;
   }
@@ -70,7 +72,7 @@ export function AppProvider({ children }) {
   function limparFluxoProjeto() {
     setImagem(null); setMime(null); setAnalise(null); setModoDemo(false);
     setErroAnalise(null); setMedidaManual(null); setOrigemMedida(null); setPlantaImagem(null);
-    setBriefing(null); setErroConcierge(null);
+    setBriefing(null); setErroConcierge(null); setAmbienteEscolhido(null); setReformaCompleta(false);
   }
 
   return (
@@ -80,6 +82,7 @@ export function AppProvider({ children }) {
       medidaManual, setMedidaManual, origemMedida, setOrigemMedida,
       plantaImagem, setPlantaImagem, estatura, setEstatura, vaoUtil,
       briefing, setBriefing, erroConcierge, setErroConcierge,
+      ambienteEscolhido, setAmbienteEscolhido, reformaCompleta, setReformaCompleta,
       designFoto, setDesignFoto, designEstilo, setDesignEstilo, designPaleta, setDesignPaleta,
       designResultado, setDesignResultado, designErro, setDesignErro,
       carrinho, setCarrinho, adicionarAoCarrinho, removerDoCarrinho, totalCarrinho,

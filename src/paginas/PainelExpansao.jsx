@@ -21,7 +21,7 @@ export default function PainelExpansao() {
       if (!dados.recomendada) throw new Error("resposta incompleta");
       setResultado(dados);
     } catch {
-      setErro("Não foi possível gerar a recomendação agora. Verifique a configuração de ANTHROPIC_API_KEY no Netlify — ou use o exemplo pronto abaixo.");
+      setErro("Não foi possível gerar a recomendação agora. Confira a chave da API no Netlify, ou use o exemplo pronto abaixo.");
     } finally {
       setCarregando(false);
     }
@@ -30,7 +30,7 @@ export default function PainelExpansao() {
   function usarExemplo() {
     setResultado({
       recomendada: "Curitiba, PR",
-      raciocinio: "Curitiba combina a maior nota de satisfação entre as regiões com volume relevante (8,8) com a maior densidade de executores certificados por cliente potencial — o que reduz o risco operacional de abrir uma nova praça. O ticket médio também está entre os mais altos. O ponto de atenção é o volume absoluto de clientes, menor que Rio de Janeiro.",
+      raciocinio: "Curitiba combina a maior nota de satisfação entre as regiões com volume relevante (8,8) com a maior densidade de executores certificados por cliente potencial, o que reduz o risco operacional de abrir uma nova praça. O ticket médio também está entre os mais altos. O ponto de atenção é o volume absoluto de clientes, menor que Rio de Janeiro.",
       alternativas: [
         { regiao: "Rio de Janeiro, RJ", motivo: "Maior volume de clientes potenciais, mas satisfação mais baixa (8,1) pede investimento extra em suporte antes de escalar." },
         { regiao: "Belo Horizonte, MG", motivo: "Bom equilíbrio geral, mas sem um fator que se destaque claramente sobre Curitiba." },
@@ -42,11 +42,11 @@ export default function PainelExpansao() {
   return (
     <AppFrame titulo="Painel HomeHub">
       <div className="painelInternoTag">PAINEL INTERNO HOMEHUB · NÃO VISÍVEL AO CLIENTE</div>
-      <h2 className="tituloTela">Priorização de expansão — Fase 2</h2>
+      <h2 className="tituloTela">Priorização de expansão, Fase 2</h2>
       <p className="subtituloTela">
         Quarta aplicação de IA do projeto: não atende o cliente, atende a decisão da própria HomeHub sobre
         onde a Fase 2 do roadmap começa. Os números abaixo são uma simulação a partir da base atual de 23.000
-        clientes — na Fase 2 real, entram os números medidos no piloto do Sudeste.
+        clientes. Na Fase 2 real, entram os números medidos no piloto do Sudeste.
       </p>
 
       <div className="listaRegioes">
