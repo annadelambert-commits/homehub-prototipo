@@ -2,9 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../contexto/AppState";
 import AppFrame from "../componentes/AppFrame";
-import { REFERENCIAS, ANALISE_DEMO } from "../dados/homehub";
+import { REFERENCIAS, ANALISE_DEMO, PRODUTOS } from "../dados/homehub";
 
-const PASSO = { INTRO: 0, FOTO: 1, PLANTA: 2, MANUAL: 3, MEDIDO: 4 };
+function brl0(v) { return "R$ " + Math.round(v).toLocaleString("pt-BR"); }
+function brl(v) { return "R$ " + v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+const PASSO = { INTRO: 0, FOTO: 1, PLANTA: 2, MANUAL: 3, MEDIDO: 4, CATALOGO: 5, RESUMO: 6 };
 
 export default function MoveisPlanejados() {
   const nav = useNavigate();
@@ -68,12 +71,21 @@ export default function MoveisPlanejados() {
   }
 
   function solicitarOrcamento() {
-    // leva ao concierge, já com a medida no contexto
-    app.setBriefing(null);
-    nav("/projeto-completo?origem=planejados");
+    setPasso(PASSO.CATALOGO);
+  }
+
+  function adicionarMovelAoCarrinho() {
+    const p = app.produtoAtual;
+    if (!p) return;
+    const clienteJaMediu = app.origemMedida === "manual" || app.origemMedida === "planta";
+    const medicao = clienteJaMediu ? 0 : 180;
+    app.adicionarAoCarrinho({ nome: p.nome, valor: p.valor, montagem: p.montagem + medicao, categoriaId: "moveis-planejados" });
+    setPasso(PASSO.RESUMO);
   }
 
   const a = app.analise;
+  const vao = app.vaoUtil();
+  const catalogoMoveis = PRODUTOS["moveis-planejados"].filter((p) => p.tipo === "movel");
 
   return (
     <AppFrame titulo="Móveis Planejados" comNavInferior={false}>
@@ -187,8 +199,49 @@ export default function MoveisPlanejados() {
             <p>Agora que o ambiente está medido, descreva como você quer o móvel (estilo, portas, prateleiras, cor) e a IA monta o orçamento com base nas medidas e nas suas especificações.</p>
           </div>
           <div className="ctaFixo">
-            <button className="btPrimario" onClick={solicitarOrcamento}>Solicitar orçamento →</button>
+            <button className="btPrimario" onClick={solicitarOrcamento}>Ver móveis que cabem →</button>
             <button className="btSecundario" onClick={() => setPasso(PASSO.INTRO)}>Refazer medida</button>
+          </div>
+        </>
+      )}
+
+      {passo === PASSO.CATALOGO && (
+        <>
+          <h2 className="tituloTela">{vao ? `O que cabe no seu vão de ${vao} cm` : "Escolha o móvel"}</h2>
+          {!vao && <div className="cartao alerta"><p>Medida exata ainda pendente de validação. Mostrando o catálogo completo.</p></div>}
+          {catalogoMoveis.map((p) => {
+            const cabe = !vao || p.l <= vao;
+            return (
+              <button key={p.id} className={"produtoCard largo" + (app.produtoAtual?.id === p.id ? " sel" : "")}
+                disabled={!cabe} onClick={() => app.setProdutoAtual(p)}>
+                <div className="produtoImg foto" style={{ backgroundImage: `url(${p.img})` }} />
+                <div className="produtoInfo">
+                  <b>{p.nome}</b>
+                  <span className="produtoDesc">{p.l} × {p.p} × {p.a} cm. {p.desc}</span>
+                  <span className="produtoPreco">{brl0(p.valor)}</span>
+                  {vao && <span className={"tagCabe " + (cabe ? "sim" : "nao")}>{cabe ? `cabe, sobram ${vao - p.l} cm` : "não cabe"}</span>}
+                </div>
+              </button>
+            );
+          })}
+          <div className="ctaFixo">
+            <button className="btPrimario" disabled={!app.produtoAtual} onClick={adicionarMovelAoCarrinho}>Continuar</button>
+          </div>
+        </>
+      )}
+
+      {passo === PASSO.RESUMO && app.produtoAtual && (
+        <>
+          <h2 className="tituloTela">{app.produtoAtual.nome}</h2>
+          <div className="cartaoResumo">
+            <div className="linhaResumo"><span>Móvel planejado</span><b>{brl(app.produtoAtual.valor)}</b></div>
+            <div className="linhaResumo"><span>Montagem e medição</span><b>{brl(app.produtoAtual.montagem)}</b></div>
+            <div className="linhaResumo total"><span>Total</span><b>{brl(app.produtoAtual.valor + app.produtoAtual.montagem)}</b></div>
+          </div>
+          <div className="cartao bom"><h4>Adicionado ao carrinho</h4><p>Você pode continuar comprando ou fechar o pedido.</p></div>
+          <div className="ctaFixo">
+            <button className="btPrimario" onClick={() => nav("/carrinho")}>Ver carrinho</button>
+            <button className="btSecundario" onClick={() => nav("/categoria/moveis-planejados")}>Continuar comprando</button>
           </div>
         </>
       )}

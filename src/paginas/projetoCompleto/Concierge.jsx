@@ -2,21 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../contexto/AppState";
 import AppFrame from "../../componentes/AppFrame";
-import { INCENTIVO_FASEADO } from "../../dados/homehub";
-
-const AMBIENTES = [
-  { id: "cozinha", nome: "Cozinha", orc: 20000 },
-  { id: "banheiro", nome: "Banheiro", orc: 8000 },
-  { id: "sala", nome: "Sala de estar", orc: 12000 },
-  { id: "quarto", nome: "Quarto", orc: 9000 },
-  { id: "outro", nome: "Outro ambiente", orc: 10000 },
-];
+import { AMBIENTES, INCENTIVO_FASEADO } from "../../dados/homehub";
 
 export default function Concierge() {
   const nav = useNavigate();
   const app = useApp();
   const [texto, setTexto] = useState("");
   const [carregando, setCarregando] = useState(false);
+  const [avancou, setAvancou] = useState(app.ambientesSelecionados.length > 0);
 
   async function enviarConcierge() {
     if (!texto.trim()) return;
@@ -37,52 +30,74 @@ export default function Concierge() {
     }
   }
 
-  const ambiente = AMBIENTES.find((a) => a.id === app.ambienteEscolhido);
+  const selecionados = AMBIENTES.filter((a) => app.ambientesSelecionados.includes(a.id));
+  const nomeAmbientes = selecionados.map((a) => a.nome.toLowerCase()).join(", ");
+  const orcTotal = selecionados.reduce((s, a) => s + a.orc, 0) || 10000;
 
-  function escolherAmbiente(a) {
-    app.setAmbienteEscolhido(a.id);
-    app.setProjetoAtivoId(a.id === "outro" || a.id === "quarto" ? app.projetoAtivoId : a.id);
+  function toggleAmbiente(id) {
+    app.setAmbientesSelecionados((sel) => sel.includes(id) ? sel.filter((s) => s !== id) : [...sel, id]);
+  }
+
+  function escolherTodos() {
+    const todos = AMBIENTES.map((a) => a.id);
+    const jaTodos = todos.every((id) => app.ambientesSelecionados.includes(id));
+    app.setAmbientesSelecionados(jaTodos ? [] : todos);
+    app.setReformaCompleta(!jaTodos);
+  }
+
+  function confirmarAmbientes() {
+    if (app.ambientesSelecionados.length > 1) app.setReformaCompleta(true);
+    app.setProjetoAtivoId(app.ambientesSelecionados[0]);
+    setAvancou(true);
   }
 
   function usarExemplo() {
     app.setBriefing({
-      ambiente: ambiente.nome, orcamento: ambiente.orc, estilo: "moderno", prazo_dias: 45, prioridade: "funcionalidade",
-      resumo: `Entendi: reforma de ${ambiente.nome.toLowerCase()}, estilo moderno, orçamento de R$ ${ambiente.orc.toLocaleString("pt-BR")}, prazo de 45 dias e foco em funcionalidade.`,
+      ambiente: nomeAmbientes, orcamento: orcTotal, estilo: "moderno", prazo_dias: 45, prioridade: "funcionalidade",
+      resumo: `Entendi: reforma de ${nomeAmbientes}, estilo moderno, orçamento de R$ ${orcTotal.toLocaleString("pt-BR")}, prazo de 45 dias e foco em funcionalidade.`,
     });
     app.setErroConcierge(null);
   }
 
-  // ---- passo 0: qual ambiente, e se é reforma completa por etapas ----
-  if (!ambiente) {
+  // ---- passo 0: quais ambientes, e se é reforma completa por etapas ----
+  if (!avancou) {
     return (
       <AppFrame titulo="Projeto Completo" comNavInferior={false}>
         <div className="passoIndicador"><i className="ativo" /><i /><i /><i /><i /></div>
         <h2 className="tituloTela">Por onde você quer começar?</h2>
-        <p className="subtituloTela">Escolha o ambiente desta etapa. Você pode reformar a casa inteira, um ambiente por vez.</p>
+        <p className="subtituloTela">Escolha um ou mais ambientes desta etapa. Dá pra reformar a casa inteira, aos poucos.</p>
 
         <div className="gradeAmbientes">
           {AMBIENTES.map((a) => (
-            <button key={a.id} className="ambienteChip" onClick={() => escolherAmbiente(a)}>{a.nome}</button>
+            <button key={a.id} className={"ambienteChip" + (app.ambientesSelecionados.includes(a.id) ? " sel" : "")}
+              onClick={() => toggleAmbiente(a.id)}>{a.nome}</button>
           ))}
+          <button className={"ambienteChip destaque" + (app.reformaCompleta ? " sel" : "")} onClick={escolherTodos}>
+            🏠 Casa toda
+          </button>
         </div>
 
         <div className="cartao bom" style={{ marginTop: 4 }}>
           <h4>Reforma completa custa menos, mesmo em etapas</h4>
           <p>{INCENTIVO_FASEADO.texto} Você decide o ritmo, de acordo com orçamento e crédito disponíveis. Nenhum ambiente fica bloqueado.</p>
         </div>
+
+        <div className="ctaFixo">
+          <button className="btPrimario" disabled={selecionados.length === 0} onClick={confirmarAmbientes}>Continuar</button>
+        </div>
       </AppFrame>
     );
   }
 
   return (
-    <AppFrame titulo="Projeto Completo" voltar={() => app.setAmbienteEscolhido(null)} comNavInferior={false}>
+    <AppFrame titulo="Projeto Completo" voltar={() => setAvancou(false)} comNavInferior={false}>
       <div className="passoIndicador"><i className="feito" /><i className="ativo" /><i /><i /><i /></div>
-      <h2 className="tituloTela">Conte como quer sua {ambiente.nome.toLowerCase()}</h2>
+      <h2 className="tituloTela">Conte como quer sua reforma de {nomeAmbientes}</h2>
       {!app.briefing && (
         <>
           <p className="subtituloTela">Descreva com suas palavras: orçamento, estilo, o que for importante. A IA organiza isso num projeto.</p>
           <textarea className="chatInput" rows={4} value={texto} onChange={(e) => setTexto(e.target.value)}
-            placeholder={`Ex.: Quero reformar minha ${ambiente.nome.toLowerCase()}, algo moderno, com bastante espaço de armazenamento.`} />
+            placeholder={`Ex.: Quero reformar ${nomeAmbientes}, algo moderno, com bastante espaço de armazenamento.`} />
           <div className="ctaFixo">
             <button className="btPrimario" disabled={!texto.trim() || carregando} onClick={enviarConcierge}>
               {carregando ? "Consultando a IA…" : "Enviar para o concierge"}
@@ -96,7 +111,7 @@ export default function Concierge() {
         <>
           <div className="cartao bom"><h4>Briefing estruturado pela IA</h4><p>{app.briefing.resumo}</p></div>
           <div className="cartaoResumo">
-            <div className="linhaResumo"><span>Ambiente</span><b>{app.briefing.ambiente}</b></div>
+            <div className="linhaResumo"><span>Ambiente(s)</span><b>{app.briefing.ambiente}</b></div>
             <div className="linhaResumo"><span>Orçamento</span><b>{app.briefing.orcamento ? "R$ " + app.briefing.orcamento.toLocaleString("pt-BR") : "não informado"}</b></div>
             <div className="linhaResumo"><span>Estilo</span><b>{app.briefing.estilo || "não informado"}</b></div>
             <div className="linhaResumo"><span>Prazo desejado</span><b>{app.briefing.prazo_dias ? app.briefing.prazo_dias + " dias" : "não informado"}</b></div>
