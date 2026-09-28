@@ -151,6 +151,10 @@ button,input,select,textarea{font-family:inherit}
 .linhaMenu{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--navy6);
   padding:15px 4px;font-size:13.5px;color:var(--navy2);cursor:pointer;font-weight:500}
 .linhaMenu.sair{color:var(--redD)}
+.trocaPerfilBt{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;background:#12151A;
+  border:0;border-radius:12px;padding:14px 16px;margin:18px 0 4px;cursor:pointer}
+.trocaPerfilBt span:first-child{color:var(--w);font-size:13.5px;font-weight:700}
+.trocaPerfilSub{color:var(--navy5);font-size:10.5px}
 
 /* ---------- fluxo Projeto Completo ---------- */
 .passoIndicador{display:flex;gap:5px;margin-bottom:16px}
@@ -259,7 +263,9 @@ footer{display:none}
 .gradeAmbientes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .ambienteChip{background:var(--w);border:1.5px solid var(--navy6);border-radius:20px;padding:10px 16px;
   font-size:13px;font-weight:600;color:var(--navy2);cursor:pointer}
-.ambienteChip:active{background:var(--red5);border-color:var(--red4);color:var(--redD)}
+.ambienteChip.sel{background:var(--red5);border-color:var(--red);color:var(--redD)}
+.ambienteChip.destaque{background:var(--navy);border-color:var(--navy);color:var(--w)}
+.ambienteChip.destaque.sel{background:var(--red);border-color:var(--red);color:var(--w)}
 
 /* ---------- hero com foto de fundo ---------- */
 .heroFoto{display:block;width:100%;text-align:left;border:0;border-radius:16px;padding:24px 18px 20px;
@@ -385,6 +391,19 @@ footer{display:none}
 .itemProjeto b{font-size:12px;color:var(--navy);display:block}
 .itemProjetoCat{font-size:9px;color:var(--navy4)}
 .itemProjetoValor{font-size:12.5px;font-weight:700;color:var(--navy);white-space:nowrap}
+.itemProjeto.editavel{flex-wrap:wrap}
+.itemProjetoAcoes{display:flex;align-items:center;gap:8px}
+.btRemoverItem{background:none;border:none;color:var(--navy4);font-size:13px;cursor:pointer;padding:4px 6px;border-radius:6px;line-height:1}
+.btRemoverItem:hover{background:var(--navy6);color:var(--redD)}
+
+/* ---------- seletor de quantidade ---------- */
+.seletorQtd{display:flex;align-items:center;gap:8px;margin-top:4px}
+.seletorQtd button{width:24px;height:24px;border-radius:6px;border:1px solid var(--navy6);background:var(--w);
+  font-size:14px;line-height:1;cursor:pointer;color:var(--navy)}
+.seletorQtd button:disabled{opacity:.35;cursor:default}
+.seletorQtd span{font-size:12px;font-weight:700;color:var(--navy);min-width:20px;text-align:center}
+.seletorQtd.pequeno{margin-top:0}
+.seletorQtd.pequeno button{width:20px;height:20px;font-size:12px}
 
 /* ---------- medidas de ambiente (móveis planejados) ---------- */
 .linhaMedidas{display:flex;gap:8px}
@@ -419,3 +438,25 @@ body[data-theme="dark"] .iaExecCorpo{border-color:#262B33}
 body[data-theme="dark"] .suporteMsg.eu{background:#1E2430;color:#EDEFF2}
 body[data-theme="dark"] .suporteMsg.ia{background:#2A1A22;color:#F0C9CE}
 body[data-theme="dark"] .suporteVazio{color:#7A8394}
+body[data-theme="dark"] .segmentado{background:#171B22;border-color:#262B33}
+body[data-theme="dark"] .segmentado button.sel{background:#262B33;color:#EDEFF2}
+body[data-theme="dark"] .segmentado button{color:#8890A0}
+body[data-theme="dark"] .cartaoStat{background:#171B22;border-color:#262B33}
+body[data-theme="dark"] .statRotulo{color:#8890A0}
+body[data-theme="dark"] .statValor{color:#EDEFF2}
+body[data-theme="dark"] .tabelaExec{background:#171B22;border-color:#262B33}
+body[data-theme="dark"] .tabelaExec th{color:#8890A0;border-bottom-color:#262B33}
+body[data-theme="dark"] .tabelaExec td{color:#EDEFF2;border-bottom-color:#20242C}
+
+/* ---------- painel executivo: segmentado, stats, tabela ---------- */
+.segmentado{display:flex;background:var(--navy6);border:1px solid var(--navy6);border-radius:10px;padding:3px;gap:3px;margin-bottom:14px}
+.segmentado button{flex:1;padding:8px 4px;border:none;background:transparent;border-radius:8px;font-size:12px;font-weight:700;color:var(--navy4);cursor:pointer}
+.segmentado button.sel{background:var(--w);color:var(--navy)}
+.gradeStats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}
+.cartaoStat{background:var(--w);border:1px solid var(--navy6);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.statRotulo{font-size:9.5px;color:var(--navy4);line-height:1.3}
+.statValor{font-size:16px;color:var(--navy);font-weight:800}
+.tabelaExec{width:100%;border-collapse:collapse;background:var(--w);border:1px solid var(--navy6);border-radius:10px;overflow:hidden;font-size:10.5px;margin-top:8px}
+.tabelaExec th{text-align:left;padding:8px 9px;color:var(--navy4);font-weight:700;border-bottom:1px solid var(--navy6)}
+.tabelaExec td{padding:7px 9px;color:var(--navy);border-bottom:1px solid var(--navy7,#F1EEE8)}
+.tabelaExec tr:last-child td{border-bottom:none}

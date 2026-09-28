@@ -2,16 +2,26 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../contexto/AppState";
 import AppFrame from "../componentes/AppFrame";
-import { ESTILOS_DESIGN, PALETAS_DESIGN, renderPorEstilo, PROJETO_DESIGN_ITENS, DESCONTO_PACOTE } from "../dados/homehub";
+import { ESTILOS_DESIGN, PALETAS_DESIGN, renderPorEstilo, PROJETO_DESIGN_ITENS, DESCONTO_PACOTE, AMBIENTES } from "../dados/homehub";
 
 function brl(v) { return "R$ " + Math.round(v).toLocaleString("pt-BR"); }
 
-const PASSO = { FOTO: 0, ESTILO: 1, GERANDO: 2, RESULTADO: 3, PROJETO: 4 };
+const PASSO = { AMBIENTE: -1, FOTO: 0, ESTILO: 1, GERANDO: 2, RESULTADO: 3, PROJETO: 4 };
 
 export default function Design() {
   const nav = useNavigate();
   const app = useApp();
-  const [passo, setPasso] = useState(app.designResultado ? PASSO.RESULTADO : PASSO.FOTO);
+  const [passo, setPasso] = useState(app.designResultado ? PASSO.RESULTADO : (app.designAmbiente ? PASSO.FOTO : PASSO.AMBIENTE));
+  const [outroAmbiente, setOutroAmbiente] = useState("");
+
+  const nomeAmbiente = app.designAmbiente === "outro"
+    ? (outroAmbiente || "seu ambiente")
+    : (AMBIENTES.find((a) => a.id === app.designAmbiente)?.nome.toLowerCase() || "seu ambiente");
+
+  function escolherAmbiente(id) {
+    app.setDesignAmbiente(id);
+    if (id !== "outro") setPasso(PASSO.FOTO);
+  }
 
   function onFoto(e) {
     const f = e.target.files[0];
@@ -27,7 +37,7 @@ export default function Design() {
     app.setDesignErro(null);
     const est = ESTILOS_DESIGN.find((e) => e.id === app.designEstilo);
     const pal = PALETAS_DESIGN.find((p) => p.id === app.designPaleta);
-    const mensagem = `Ambiente: sala de estar. Estilo escolhido: ${est.nome} (${est.desc}). Paleta: ${pal.nome}.`;
+    const mensagem = `Ambiente: ${nomeAmbiente}. Estilo escolhido: ${est.nome} (${est.desc}). Paleta: ${pal.nome}.`;
     try {
       const resp = await fetch("/api/assistente", {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -50,7 +60,7 @@ export default function Design() {
     if (!app.designPaleta) app.setDesignPaleta("neutra");
     app.setDesignResultado({
       render: renderPorEstilo(est.id),
-      resumo: `Sua sala ganha um ar ${est.nome.toLowerCase()}: ${est.desc.toLowerCase()}, com uma paleta de tons harmônicos que traz aconchego e sofisticação. Os materiais naturais e a iluminação pensada valorizam cada canto do ambiente.`,
+      resumo: `Seu(sua) ${nomeAmbiente} ganha um ar ${est.nome.toLowerCase()}: ${est.desc.toLowerCase()}, com uma paleta de tons harmônicos que traz aconchego e sofisticação. Os materiais naturais e a iluminação pensada valorizam cada canto do ambiente.`,
       destaques: ["Sofá amplo como ponto central", "Painel ripado para a TV", "Iluminação em camadas", "Têxteis e plantas para aquecer o ambiente"],
     });
     app.setDesignErro(null);
@@ -70,17 +80,43 @@ export default function Design() {
     nav("/carrinho");
   }
   function fazerPorEtapas() {
-    app.setProjetoAtivoId("sala");
+    app.setProjetoAtivoId(app.designAmbiente && app.designAmbiente !== "outro" ? app.designAmbiente : "sala");
     nav("/projetos");
   }
 
   return (
     <AppFrame titulo="Projetar com IA" comNavInferior={false}>
+      {/* PASSO 0: AMBIENTE */}
+      {passo === PASSO.AMBIENTE && (
+        <>
+          <div className="passoIndicador"><i className="ativo" /><i /><i /><i /><i /></div>
+          <h2 className="tituloTela">Qual ambiente você quer transformar?</h2>
+          <p className="subtituloTela">A IA gera o render e a lista de itens pensando nesse ambiente.</p>
+          <div className="gradeAmbientes">
+            {AMBIENTES.map((a) => (
+              <button key={a.id} className={"ambienteChip" + (app.designAmbiente === a.id ? " sel" : "")}
+                onClick={() => escolherAmbiente(a.id)}>{a.nome}</button>
+            ))}
+            <button className={"ambienteChip" + (app.designAmbiente === "outro" ? " sel" : "")}
+              onClick={() => escolherAmbiente("outro")}>Outro ambiente</button>
+          </div>
+          {app.designAmbiente === "outro" && (
+            <>
+              <input className="inputCheio" placeholder="Qual ambiente? Ex.: escritório, varanda"
+                value={outroAmbiente} onChange={(e) => setOutroAmbiente(e.target.value)} />
+              <div className="ctaFixo">
+                <button className="btPrimario" disabled={!outroAmbiente.trim()} onClick={() => setPasso(PASSO.FOTO)}>Continuar</button>
+              </div>
+            </>
+          )}
+        </>
+      )}
+
       {/* PASSO 1: FOTO */}
       {passo === PASSO.FOTO && (
         <>
-          <div className="passoIndicador"><i className="ativo" /><i /><i /></div>
-          <h2 className="tituloTela">Fotografe o ambiente que quer transformar</h2>
+          <div className="passoIndicador"><i className="feito" /><i className="ativo" /><i /><i /><i /></div>
+          <h2 className="tituloTela">Fotografe {nomeAmbiente}</h2>
           <p className="subtituloTela">A IA usa sua foto como base para propor a reforma no estilo que você escolher. Você pode pular e usar um ambiente de exemplo.</p>
           {app.designFoto && <img className="prevImg" src={app.designFoto} alt="Ambiente enviado" />}
           <label className="soltaArquivo">
@@ -97,7 +133,7 @@ export default function Design() {
       {/* PASSO 2: ESTILO + PALETA */}
       {passo === PASSO.ESTILO && (
         <>
-          <div className="passoIndicador"><i className="feito" /><i className="ativo" /><i /></div>
+          <div className="passoIndicador"><i className="feito" /><i className="feito" /><i className="ativo" /><i /><i /></div>
           <h2 className="tituloTela">Escolha o estilo e a paleta</h2>
           <label className="rotuloSecao">Estilo</label>
           <div className="gradeEstilos">
@@ -136,7 +172,7 @@ export default function Design() {
       {/* PASSO 4: RESULTADO (render) */}
       {passo === PASSO.RESULTADO && app.designResultado && (
         <>
-          <div className="passoIndicador"><i className="feito" /><i className="feito" /><i className="ativo" /></div>
+          <div className="passoIndicador"><i className="feito" /><i className="feito" /><i className="feito" /><i className="ativo" /><i /></div>
           <h2 className="tituloTela">Seu novo ambiente</h2>
           <div className="renderBox">
             <img src={app.designResultado.render} alt="Ambiente reformado" />
@@ -163,7 +199,7 @@ export default function Design() {
       {/* PASSO 5: PROJETO com itens e preços */}
       {passo === PASSO.PROJETO && (
         <>
-          <div className="passoIndicador"><i className="feito" /><i className="feito" /><i className="feito" /></div>
+          <div className="passoIndicador"><i className="feito" /><i className="feito" /><i className="feito" /><i className="feito" /><i className="ativo" /></div>
           <h2 className="tituloTela">Tudo o que seu projeto precisa</h2>
           <p className="subtituloTela">Cada item do render vira um item do pacote. Feche tudo junto e a HomeHub entrega, instala e garante.</p>
           <div className="listaItensProjeto">

@@ -12,10 +12,20 @@ que quer reformar. Extraia um briefing estruturado.
 
 Responda SOMENTE com um objeto JSON válido, sem markdown, sem crases, sem texto antes ou depois, no formato:
 {"ambiente":"texto curto","orcamento":<numero em reais, ou null se não informado>,"estilo":"texto curto ou null",
-"prazo_dias":<numero ou null>,"prioridade":"texto curto ou null","resumo":"uma frase natural confirmando o que entendeu, em português, para mostrar ao cliente"}
+"prazo_dias":<numero ou null>,"prioridade":"texto curto ou null","escopo":"completo" ou "categoria",
+"categoria":"id da categoria ou null","resumo":"uma frase natural confirmando o que entendeu, em português, para mostrar ao cliente"}
 
 Se o cliente não mencionar orçamento, estilo ou prazo, use null nesses campos — não invente valores.
-O campo "ambiente" deve ser o nome do cômodo ou espaço (ex.: "cozinha", "banheiro", "quarto").`;
+O campo "ambiente" deve ser o nome do cômodo ou espaço (ex.: "cozinha", "banheiro", "quarto").
+
+O campo "escopo" é "categoria" quando o cliente pede claramente um tipo específico de item em vez de um projeto
+completo do ambiente — por exemplo "só quero trocar o piso", "só pintar as paredes", "preciso só de um armário".
+Nesse caso, preencha "categoria" com o id que melhor descreve o pedido, escolhendo entre: "pisos" (piso,
+revestimento, porcelanato), "materiais" (tinta, argamassa, cimento, massa corrida), "moveis-planejados" (armários,
+cozinhas planejadas, closets), "moveis-prontos" (sofás, mesas prontas), "decoracao" (tapetes, quadros, cortinas),
+"iluminacao" (luminárias, fitas de LED), "organizacao" (closets aéreos, organizadores). Em qualquer outro caso,
+inclusive quando o cliente pede uma reforma completa do ambiente sem restringir a um tipo de item, use
+"escopo":"completo" e "categoria":null.`;
 
 const PROMPT_SUPORTE = `Você é o assistente de suporte especializado da HomeHub, uma rede de produtos para casa,
 decoração e reforma. Responda dúvidas técnicas objetivas sobre produtos, instalação, compatibilidade e prazos,

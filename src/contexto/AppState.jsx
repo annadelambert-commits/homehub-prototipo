@@ -16,13 +16,23 @@ export function AppProvider({ children }) {
   const [plantaImagem, setPlantaImagem] = useState(null);
   const [estatura, setEstatura] = useState(170);
 
+  // Medição por ambiente (fluxo Projeto Completo, multi-ambiente)
+  const [medidasPorAmbiente, setMedidasPorAmbiente] = useState({}); // { cozinha: {tipo, largura, profundidade, altura, vao, confianca}, ... }
+  const [plantaCompleta, setPlantaCompleta] = useState(null); // planta baixa única que cobre todos os ambientes selecionados
+
   // Concierge (IA texto)
   const [briefing, setBriefing] = useState(null);
   const [erroConcierge, setErroConcierge] = useState(null);
-  const [ambienteEscolhido, setAmbienteEscolhido] = useState(null);
+  const [ambientesSelecionados, setAmbientesSelecionados] = useState([]); // array de ids: ['cozinha','banheiro',...]
   const [reformaCompleta, setReformaCompleta] = useState(false);
+  const [ambienteFaseInicial, setAmbienteFaseInicial] = useState(null); // qual ambiente começa, quando é faseado
+  const [orcamentoFinal, setOrcamentoFinal] = useState(null); // true = valor fechado, false = faseado com desconto por etapa, null = ainda não perguntado
+  const [escopoFoco, setEscopoFoco] = useState(null); // 'completo' | 'categoria', ex.: cliente só quer trocar o piso
+  const [categoriaFoco, setCategoriaFoco] = useState(null); // id da categoria, ex.: 'pisos', quando escopoFoco === 'categoria'
+  const [itensProjeto, setItensProjeto] = useState([]); // itens escolhidos no fluxo Projeto Completo (multi-seleção, com quantidade)
 
   // IA de Design / Render
+  const [designAmbiente, setDesignAmbiente] = useState(null); // id do ambiente escolhido antes do estilo/paleta
   const [designFoto, setDesignFoto] = useState(null);
   const [designEstilo, setDesignEstilo] = useState(null);
   const [designPaleta, setDesignPaleta] = useState(null);
@@ -62,6 +72,32 @@ export function AppProvider({ children }) {
     if (analise) return analise.vao;
     return null;
   }
+  function toggleItemProjeto(item) {
+    setItensProjeto((its) => {
+      const existe = its.find((i) => i.id === item.id && i.categoriaId === item.categoriaId);
+      if (existe) return its.filter((i) => !(i.id === item.id && i.categoriaId === item.categoriaId));
+      return [...its, { ...item, quantidade: 1 }];
+    });
+  }
+  function setQuantidadeItem(id, categoriaId, quantidade) {
+    setItensProjeto((its) => its.map((i) =>
+      i.id === id && i.categoriaId === categoriaId ? { ...i, quantidade: Math.max(1, quantidade) } : i
+    ));
+  }
+  function totalItensProjeto() {
+    return itensProjeto.reduce((s, i) => s + ((i.valor || 0) + (i.montagem || 0)) * (i.quantidade || 1), 0);
+  }
+  // desconto de pacote fechado: cresce com o número de itens do projeto, cai progressivamente se o cliente tira itens
+  function descontoPacote() {
+    const n = itensProjeto.length;
+    if (n >= 6) return { pct: 12, label: "pacote fechado completo" };
+    if (n >= 4) return { pct: 8, label: "pacote fechado parcial" };
+    if (n >= 2) return { pct: 4, label: "combo de itens" };
+    return { pct: 0, label: null };
+  }
+  function setMedidaAmbiente(ambienteId, dados) {
+    setMedidasPorAmbiente((m) => ({ ...m, [ambienteId]: dados }));
+  }
   function concluirProjetoAtivo() {
     setProjetos((ps) => ps.map((p) => {
       if (p.id === projetoAtivoId) return { ...p, status: "concluido" };
@@ -72,7 +108,9 @@ export function AppProvider({ children }) {
   function limparFluxoProjeto() {
     setImagem(null); setMime(null); setAnalise(null); setModoDemo(false);
     setErroAnalise(null); setMedidaManual(null); setOrigemMedida(null); setPlantaImagem(null);
-    setBriefing(null); setErroConcierge(null); setAmbienteEscolhido(null); setReformaCompleta(false);
+    setBriefing(null); setErroConcierge(null); setAmbientesSelecionados([]); setReformaCompleta(false);
+    setItensProjeto([]); setMedidasPorAmbiente({}); setPlantaCompleta(null); setAmbienteFaseInicial(null);
+    setOrcamentoFinal(null); setEscopoFoco(null); setCategoriaFoco(null);
   }
 
   return (
@@ -81,8 +119,13 @@ export function AppProvider({ children }) {
       analise, setAnalise, modoDemo, setModoDemo, erroAnalise, setErroAnalise,
       medidaManual, setMedidaManual, origemMedida, setOrigemMedida,
       plantaImagem, setPlantaImagem, estatura, setEstatura, vaoUtil,
+      medidasPorAmbiente, setMedidasPorAmbiente, setMedidaAmbiente, plantaCompleta, setPlantaCompleta,
       briefing, setBriefing, erroConcierge, setErroConcierge,
-      ambienteEscolhido, setAmbienteEscolhido, reformaCompleta, setReformaCompleta,
+      ambientesSelecionados, setAmbientesSelecionados, reformaCompleta, setReformaCompleta,
+      ambienteFaseInicial, setAmbienteFaseInicial,
+      orcamentoFinal, setOrcamentoFinal, escopoFoco, setEscopoFoco, categoriaFoco, setCategoriaFoco,
+      itensProjeto, setItensProjeto, toggleItemProjeto, setQuantidadeItem, totalItensProjeto, descontoPacote,
+      designAmbiente, setDesignAmbiente,
       designFoto, setDesignFoto, designEstilo, setDesignEstilo, designPaleta, setDesignPaleta,
       designResultado, setDesignResultado, designErro, setDesignErro,
       carrinho, setCarrinho, adicionarAoCarrinho, removerDoCarrinho, totalCarrinho,

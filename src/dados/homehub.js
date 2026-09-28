@@ -12,6 +12,13 @@ const IMG = {
   escritorio: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800&q=75&fm=jpg&fit=crop",
 };
 
+export const AMBIENTES = [
+  { id: "cozinha", nome: "Cozinha", orc: 20000 },
+  { id: "banheiro", nome: "Banheiro", orc: 8000 },
+  { id: "sala", nome: "Sala de estar", orc: 12000 },
+  { id: "quarto", nome: "Quarto", orc: 9000 },
+];
+
 export const CATEGORIAS = [
   { id: "moveis-planejados", nome: "Móveis Planejados", img: IMG.planejados },
   { id: "moveis-prontos", nome: "Móveis Prontos", img: IMG.prontos },
@@ -38,50 +45,52 @@ export const SERVICOS = [
 export const PRODUTOS = {
   "moveis-planejados": [
     { id: 1, nome: "Cozinha Compacta Faina", valor: 12680, montagem: 430, dias: 18, l: 160, p: 60, a: 75,
-      desc: "Módulos superiores e inferiores, bancada em L.", img: IMG.planejados, tipo: "ambiente" },
+      desc: "Módulos superiores e inferiores, bancada em L.", img: IMG.planejados, tipo: "ambiente", ambientes: ["cozinha"] },
     { id: 2, nome: "Cozinha Planejada Ravel", valor: 16340, montagem: 520, dias: 21, l: 180, p: 65, a: 74,
-      desc: "Armários até o teto, ilha central, iluminação embutida.", img: IMG.cozinha, tipo: "ambiente" },
+      desc: "Armários até o teto, ilha central, iluminação embutida.", img: IMG.cozinha, tipo: "ambiente", ambientes: ["cozinha"] },
     { id: 4, nome: "Closet Modular Vertice", valor: 8420, montagem: 380, dias: 16, l: 140, p: 60, a: 240,
-      desc: "Sistema modular do piso ao teto.", img: IMG.decoracao, tipo: "movel" },
+      desc: "Sistema modular do piso ao teto.", img: IMG.decoracao, tipo: "movel", ambientes: ["quarto"] },
     { id: 5, nome: "Escrivaninha Home Office Aro", valor: 2840, montagem: 220, dias: 10, l: 120, p: 55, a: 75,
-      desc: "Bancada suspensa com passa-fios, para home office.", img: IMG.escritorio, tipo: "movel" },
+      desc: "Bancada suspensa com passa-fios, para home office.", img: IMG.escritorio, tipo: "movel", ambientes: ["quarto", "sala"] },
     { id: 6, nome: "Mesa de Jantar Planejada Cedro", valor: 4980, montagem: 260, dias: 12, l: 180, p: 90, a: 76,
-      desc: "Tampo em madeira maciça sob medida, 6 a 8 lugares.", img: IMG.decoracao, tipo: "movel" },
+      desc: "Tampo em madeira maciça sob medida, 6 a 8 lugares.", img: IMG.decoracao, tipo: "movel", ambientes: ["cozinha", "sala"] },
     { id: 7, nome: "Rack de TV Planejado Horizonte", valor: 3260, montagem: 210, dias: 9, l: 220, p: 40, a: 45,
-      desc: "Painel suspenso com nicho para TV e som.", img: IMG.planejados, tipo: "movel" },
+      desc: "Painel suspenso com nicho para TV e som.", img: IMG.planejados, tipo: "movel", ambientes: ["sala", "quarto"] },
     { id: 8, nome: "Estante Modular Aberta Trama", valor: 3890, montagem: 240, dias: 11, l: 200, p: 35, a: 220,
-      desc: "Do piso ao teto, nichos configuráveis, sem portas.", img: IMG.decoracao, tipo: "movel" },
+      desc: "Do piso ao teto, nichos configuráveis, sem portas.", img: IMG.decoracao, tipo: "movel", ambientes: ["sala", "quarto"] },
     { id: 9, nome: "Painel Ripado para TV", valor: 2450, montagem: 190, dias: 9, l: 240, p: 20, a: 200,
-      desc: "Ripas em madeira com iluminação embutida atrás da TV.", img: IMG.planejados, tipo: "movel" },
+      desc: "Ripas em madeira com iluminação embutida atrás da TV.", img: IMG.planejados, tipo: "movel", ambientes: ["sala", "quarto"] },
   ],
   "cozinha": [
-    { id: 20, nome: "Panelas Tramontina Set 5pç", valor: 890, desc: "Antiaderente, indução.", img: IMG.cozinha },
-    { id: 21, nome: "Coifa de Parede 90cm", valor: 1240, desc: "Inox, 2 motores.", img: IMG.cozinha },
+    { id: 20, nome: "Panelas Tramontina Set 5pç", valor: 890, desc: "Antiaderente, indução.", img: IMG.cozinha, ambientes: ["cozinha"] },
+    { id: 21, nome: "Coifa de Parede 90cm", valor: 1240, desc: "Inox, 2 motores.", img: IMG.cozinha, ambientes: ["cozinha"] },
   ],
   "banheiro": [
-    { id: 30, nome: "Gabinete Suspenso 80cm", valor: 1450, desc: "MDF laqueado, cuba esculpida.", cor: "#B7C4D6" },
-    { id: 31, nome: "Chuveiro Eletrônico", valor: 380, desc: "4 temperaturas, 7500W.", cor: "#B7C4D6" },
+    { id: 30, nome: "Gabinete Suspenso 80cm", valor: 1450, desc: "MDF laqueado, cuba esculpida.", cor: "#B7C4D6", ambientes: ["banheiro"] },
+    { id: 31, nome: "Chuveiro Eletrônico", valor: 380, desc: "4 temperaturas, 7500W.", cor: "#B7C4D6", ambientes: ["banheiro"] },
   ],
   "decoracao": [
-    { id: 40, nome: "Tapete Trama Natural 2×3m", valor: 890, desc: "Fibra natural, pronto-entrega.", img: IMG.decoracao },
-    { id: 41, nome: "Luminária de Piso Arco", valor: 640, desc: "Estrutura em metal, cúpula em linho.", img: IMG.decoracao },
-    { id: 42, nome: "Quadro Decorativo Trio", valor: 320, desc: "Impressão em tela, moldura em madeira.", img: IMG.decoracao },
+    { id: 40, nome: "Tapete Trama Natural 2×3m", valor: 890, desc: "Fibra natural, pronto-entrega.", img: IMG.decoracao, ambientes: ["sala", "quarto"] },
+    { id: 41, nome: "Luminária de Piso Arco", valor: 640, desc: "Estrutura em metal, cúpula em linho.", img: IMG.decoracao, ambientes: ["sala", "quarto"] },
+    { id: 42, nome: "Quadro Decorativo Trio", valor: 320, desc: "Impressão em tela, moldura em madeira.", img: IMG.decoracao, ambientes: ["sala", "quarto", "cozinha"] },
   ],
   "pisos": [
-    { id: 50, nome: "Porcelanato Concreto 60×60", valor: 79, unidade: "m²", desc: "Acabamento acetinado.", cor: "#C9BBA8" },
-    { id: 51, nome: "Piso Vinílico Amadeirado", valor: 65, unidade: "m²", desc: "Instalação em régua click.", cor: "#C9BBA8" },
+    { id: 50, nome: "Porcelanato Concreto 60×60", valor: 79, unidade: "m²", desc: "Acabamento acetinado.", cor: "#C9BBA8", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
+    { id: 51, nome: "Piso Vinílico Amadeirado", valor: 65, unidade: "m²", desc: "Instalação em régua click.", cor: "#C9BBA8", ambientes: ["sala", "quarto"] },
+    { id: 52, nome: "Porcelanato Polido Branco 80×80", valor: 94, unidade: "m²", desc: "Alto brilho, para ambientes secos.", cor: "#C9BBA8", ambientes: ["sala", "quarto"] },
+    { id: 53, nome: "Piso Antiderrapante para Área Molhada", valor: 71, unidade: "m²", desc: "Acabamento fosco, ideal para banheiro e cozinha.", cor: "#C9BBA8", ambientes: ["cozinha", "banheiro"] },
   ],
   "organizacao": [
-    { id: 60, nome: "Closet Aéreo 3 Portas", valor: 1290, desc: "Correr, espelho central.", cor: "#B9C9B4" },
-    { id: 61, nome: "Kit Organizadores Gaveta", valor: 149, desc: "Acrílico, 6 peças.", cor: "#B9C9B4" },
+    { id: 60, nome: "Closet Aéreo 3 Portas", valor: 1290, desc: "Correr, espelho central.", cor: "#B9C9B4", ambientes: ["quarto"] },
+    { id: 61, nome: "Kit Organizadores Gaveta", valor: 149, desc: "Acrílico, 6 peças.", cor: "#B9C9B4", ambientes: ["cozinha", "banheiro", "quarto"] },
   ],
   "iluminacao": [
-    { id: 70, nome: "Pendente Industrial Trio", valor: 480, desc: "Suspensão ajustável.", cor: "#E3CA9A" },
-    { id: 71, nome: "Fita LED 5m RGB", valor: 129, desc: "Controle por app.", cor: "#E3CA9A" },
+    { id: 70, nome: "Pendente Industrial Trio", valor: 480, desc: "Suspensão ajustável.", cor: "#E3CA9A", ambientes: ["cozinha", "sala"] },
+    { id: 71, nome: "Fita LED 5m RGB", valor: 129, desc: "Controle por app.", cor: "#E3CA9A", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
   ],
   "moveis-prontos": [
-    { id: 80, nome: "Sofá Retrátil 3 Lugares", valor: 3290, desc: "Suede, base reclinável.", img: IMG.prontos },
-    { id: 81, nome: "Mesa de Jantar 6 Lugares", valor: 2140, desc: "Madeira maciça, tampo vidro.", img: IMG.prontos },
+    { id: 80, nome: "Sofá Retrátil 3 Lugares", valor: 3290, desc: "Suede, base reclinável.", img: IMG.prontos, ambientes: ["sala"] },
+    { id: 81, nome: "Mesa de Jantar 6 Lugares", valor: 2140, desc: "Madeira maciça, tampo vidro.", img: IMG.prontos, ambientes: ["cozinha", "sala"] },
   ],
   "jardim": [
     { id: 90, nome: "Conjunto Mesa e Cadeiras Externas", valor: 1690, desc: "Alumínio, resistente à chuva.", img: IMG.jardim },
@@ -91,7 +100,10 @@ export const PRODUTOS = {
     { id: 100, nome: "Furadeira de Impacto 750W", valor: 349, desc: "Kit com 20 acessórios.", img: IMG.ferramentas },
   ],
   "materiais": [
-    { id: 110, nome: "Cimento CP-II 50kg", valor: 42, desc: "Saco, uso geral.", cor: "#C7C2BC" },
+    { id: 110, nome: "Cimento CP-II 50kg", valor: 42, desc: "Saco, uso geral.", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
+    { id: 111, nome: "Argamassa AC-II 20kg", valor: 36, desc: "Assentamento de porcelanato e revestimentos.", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
+    { id: 112, nome: "Tinta Acrílica Premium 18L", valor: 389, desc: "Fosca, lavável, cobertura de até 300m².", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
+    { id: 113, nome: "Massa Corrida para Parede 25kg", valor: 68, desc: "Preparo de parede antes da pintura.", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
   ],
 };
 
@@ -130,6 +142,7 @@ export const INCENTIVO_FASEADO = {
 };
 
 export const REC_ANO = 175369820;
+export const CLIENTES_BASE = 23000;
 
 // Painel interno de priorização de expansão (Fase 2 do roadmap) — não é tela de cliente.
 // Números são uma simulação a partir da base atual de 23.000 clientes; a etiqueta na tela
