@@ -24,7 +24,7 @@ export default function Home() {
       </form>
 
       <button className="heroFoto" style={{ backgroundImage: `linear-gradient(180deg, rgba(12,15,20,.35), rgba(12,15,20,.82)), url(${IMG_HERO})` }}
-        onClick={() => nav("/comecar")}>
+        onClick={() => nav("/projeto-completo")}>
         <h2>Sua reforma. Do projeto à execução.</h2>
         <p>Planeje, compre e acompanhe sua reforma em um só lugar, com escopo, produtos, serviços e execução coordenados. Sai mais em conta fazer completa, mesmo em etapas.</p>
         <span className="heroCta">Começar meu projeto →</span>

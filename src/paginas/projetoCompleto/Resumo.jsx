@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useApp } from "../../contexto/AppState";
 import AppFrame from "../../componentes/AppFrame";
-import { AMBIENTES } from "../../dados/homehub";
 
 function brl(v) { return "R$ " + v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
@@ -10,57 +9,38 @@ export default function Resumo() {
   const nav = useNavigate();
   const app = useApp();
   const [adicionado, setAdicionado] = useState(false);
-  const itens = app.itensProjeto;
+  const p = app.produtoAtual;
 
-  if (itens.length === 0) return (
+  if (!p) return (
     <AppFrame titulo="Projeto Completo" comNavInferior={false}>
-      <p className="vazioTxt">Nenhum item escolhido ainda.</p>
-      <div className="ctaFixo"><button className="btPrimario" onClick={() => nav("/projeto-completo/escolha")}>Escolher itens</button></div>
+      <p className="vazioTxt">Nenhum produto escolhido ainda.</p>
+      <div className="ctaFixo"><button className="btPrimario" onClick={() => nav("/projeto-completo/escolha")}>Escolher produto</button></div>
     </AppFrame>
   );
 
-  const nomeAmbientes = AMBIENTES.filter((a) => app.ambientesSelecionados.includes(a.id))
-    .map((a) => a.nome.toLowerCase()).join(", ") || "seu projeto";
-
   const clienteJaMediu = app.origemMedida === "manual" || app.origemMedida === "planta";
   const medicao = clienteJaMediu ? 0 : 180;
-  const subtotal = app.totalItensProjeto();
-  const total = subtotal + medicao + 240;
-  const maiorPrazo = Math.max(...itens.map((i) => i.dias || 10));
-  const d = new Date(); d.setDate(d.getDate() + maiorPrazo - (clienteJaMediu ? 2 : 0));
+  const total = p.valor + p.montagem + medicao + 240;
+  const d = new Date(); d.setDate(d.getDate() + p.dias - (clienteJaMediu ? 2 : 0));
 
   function adicionar() {
-    for (const it of itens) {
-      app.adicionarAoCarrinho({ nome: it.nome + " (Projeto Completo)", valor: it.valor, montagem: (it.montagem || 0), categoriaId: it.categoriaId });
-    }
-    app.adicionarAoCarrinho({ nome: "Medição e entrega do projeto", valor: 0, montagem: medicao + 240, categoriaId: "servico" });
+    app.adicionarAoCarrinho({ nome: p.nome + " (Projeto Completo)", valor: p.valor, montagem: p.montagem + medicao + 240, categoriaId: "moveis-planejados" });
     setAdicionado(true);
   }
 
   return (
     <AppFrame titulo="Projeto Completo" comNavInferior={false}>
       <div className="passoIndicador"><i className="feito" /><i className="feito" /><i className="feito" /><i className="ativo" /></div>
-      <h2 className="tituloTela">Projeto de {nomeAmbientes}</h2>
-
-      <div className="listaItensProjeto">
-        {itens.map((it) => (
-          <div key={it.categoriaId + "-" + it.id} className="itemProjeto">
-            <div>
-              <b>{it.nome}</b>
-              <span className="itemProjetoCat">{it.montagem ? "com montagem" : ""}</span>
-            </div>
-            <span className="itemProjetoValor">{brl(it.valor + (it.montagem || 0))}</span>
-          </div>
-        ))}
-      </div>
+      <h2 className="tituloTela">{p.nome}</h2>
 
       <div className="cartaoResumo">
-        <div className="linhaResumo"><span>Itens do projeto</span><b>{brl(subtotal)}</b></div>
+        <div className="linhaResumo"><span>Móvel planejado</span><b>{brl(p.valor)}</b></div>
         {clienteJaMediu ? (
           <div className="linhaResumo"><span>Medição profissional</span><b style={{ color: "var(--ok)" }}>Dispensada, você já mediu</b></div>
         ) : (
           <div className="linhaResumo"><span>Medição profissional</span><b>{brl(medicao)}</b></div>
         )}
+        <div className="linhaResumo"><span>Montagem certificada</span><b>{brl(p.montagem)}</b></div>
         <div className="linhaResumo"><span>Entrega</span><b>{brl(240)}</b></div>
         <div className="linhaResumo total"><span>Total, fechado hoje</span><b>{brl(total)}</b></div>
       </div>
@@ -81,7 +61,6 @@ export default function Resumo() {
         ) : (
           <button className="btPrimario" onClick={adicionar}>Adicionar ao carrinho</button>
         )}
-        {!adicionado && <button className="btSecundario" onClick={() => nav("/projeto-completo/escolha")}>Ajustar itens</button>}
       </div>
     </AppFrame>
   );

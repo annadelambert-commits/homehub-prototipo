@@ -21,7 +21,7 @@ export default function Categoria() {
   return (
     <AppFrame titulo={cat ? cat.nome : "Categoria"}>
       {ehPlanejados && (
-        <button className="pgBanner" onClick={() => nav("/comecar")}>
+        <button className="pgBanner" onClick={() => nav("/moveis-planejados")}>
           <span className="pgTag">HOMEHUB PROJETO GARANTIDO</span>
           <h3>Uma reforma coordenada de ponta a ponta.</h3>
           <p>Comece por uma etapa, defina escopo, preço e prazo, e conte com produtos + serviços + acompanhamento.</p>

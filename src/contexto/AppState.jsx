@@ -19,9 +19,8 @@ export function AppProvider({ children }) {
   // Concierge (IA texto)
   const [briefing, setBriefing] = useState(null);
   const [erroConcierge, setErroConcierge] = useState(null);
-  const [ambientesSelecionados, setAmbientesSelecionados] = useState([]); // array de ids: ['cozinha','banheiro',...]
+  const [ambienteEscolhido, setAmbienteEscolhido] = useState(null);
   const [reformaCompleta, setReformaCompleta] = useState(false);
-  const [itensProjeto, setItensProjeto] = useState([]); // itens escolhidos no fluxo Projeto Completo (multi-seleção)
 
   // IA de Design / Render
   const [designFoto, setDesignFoto] = useState(null);
@@ -63,16 +62,6 @@ export function AppProvider({ children }) {
     if (analise) return analise.vao;
     return null;
   }
-  function toggleItemProjeto(item) {
-    setItensProjeto((its) => {
-      const existe = its.find((i) => i.id === item.id && i.categoriaId === item.categoriaId);
-      if (existe) return its.filter((i) => !(i.id === item.id && i.categoriaId === item.categoriaId));
-      return [...its, item];
-    });
-  }
-  function totalItensProjeto() {
-    return itensProjeto.reduce((s, i) => s + (i.valor || 0) + (i.montagem || 0), 0);
-  }
   function concluirProjetoAtivo() {
     setProjetos((ps) => ps.map((p) => {
       if (p.id === projetoAtivoId) return { ...p, status: "concluido" };
@@ -83,8 +72,7 @@ export function AppProvider({ children }) {
   function limparFluxoProjeto() {
     setImagem(null); setMime(null); setAnalise(null); setModoDemo(false);
     setErroAnalise(null); setMedidaManual(null); setOrigemMedida(null); setPlantaImagem(null);
-    setBriefing(null); setErroConcierge(null); setAmbientesSelecionados([]); setReformaCompleta(false);
-    setItensProjeto([]);
+    setBriefing(null); setErroConcierge(null); setAmbienteEscolhido(null); setReformaCompleta(false);
   }
 
   return (
@@ -94,8 +82,7 @@ export function AppProvider({ children }) {
       medidaManual, setMedidaManual, origemMedida, setOrigemMedida,
       plantaImagem, setPlantaImagem, estatura, setEstatura, vaoUtil,
       briefing, setBriefing, erroConcierge, setErroConcierge,
-      ambientesSelecionados, setAmbientesSelecionados, reformaCompleta, setReformaCompleta,
-      itensProjeto, setItensProjeto, toggleItemProjeto, totalItensProjeto,
+      ambienteEscolhido, setAmbienteEscolhido, reformaCompleta, setReformaCompleta,
       designFoto, setDesignFoto, designEstilo, setDesignEstilo, designPaleta, setDesignPaleta,
       designResultado, setDesignResultado, designErro, setDesignErro,
       carrinho, setCarrinho, adicionarAoCarrinho, removerDoCarrinho, totalCarrinho,
