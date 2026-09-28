@@ -1,10 +1,24 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../contexto/AppState";
 import AppFrame from "../../componentes/AppFrame";
 import { PRODUTOS, CATEGORIAS, CATEGORIAS_REFORMA, AMBIENTES } from "../../dados/homehub";
 
 function brl0(v) { return "R$ " + Math.round(v).toLocaleString("pt-BR"); }
+
+// faixas de preço aceitáveis pra cada prioridade — custo-benefício puxa pro econômico, estética
+// aceita pagar mais por acabamento, rapidez não filtra por faixa (o que importa ali é entrega, não preço)
+const FAIXAS_POR_PRIORIDADE = {
+  custo: ["economico", "intermediario"],
+  estetica: ["intermediario", "premium"],
+  rapidez: null, // sem filtro de faixa
+};
+
+function itemCombina(p, { estilo, faixasAceitas }) {
+  const passaEstilo = !estilo || !Array.isArray(p.estilo) || p.estilo.includes(estilo);
+  const passaFaixa = !faixasAceitas || !p.faixa || faixasAceitas.includes(p.faixa);
+  return passaEstilo && passaFaixa;
+}
 
 export default function Escolha() {
   const nav = useNavigate();
@@ -16,43 +30,71 @@ export default function Escolha() {
   const focoCategoria = app.escopoFoco === "categoria" && app.categoriaFoco;
   const categoriaReformaInfo = focoCategoria ? CATEGORIAS_REFORMA.find((c) => c.id === app.categoriaFoco) : null;
 
+  // mesma chave usada no Concierge pra guardar o checklist "já tenho" — combinação dos ambientes desse projeto
+  const chaveJaTem = app.ambientesSelecionados.join("+") || "geral";
+  const categoriasJaTem = app.itensJaTem[chaveJaTem] || [];
+  const faixasAceitas = FAIXAS_POR_PRIORIDADE[app.projetoPrioridade] ?? null;
+
+  // categorias cujo filtro de estilo/faixa foi manualmente ignorado pelo cliente (botão "ver todas as opções")
+  const [categoriasExpandidas, setCategoriasExpandidas] = useState([]);
+  function expandirCategoria(categoriaId) {
+    setCategoriasExpandidas((c) => c.includes(categoriaId) ? c : [...c, categoriaId]);
+  }
+
   // agrupa por categoria os itens relevantes para os ambientes escolhidos. No modo "reforma por categoria"
   // (ex.: só o piso), já reúne material + mão de obra daquela frente; no modo geral, tudo que é cabível
-  // pros ambientes escolhidos entra automaticamente (o cliente edita/remove depois).
+  // pros ambientes escolhidos entra automaticamente (o cliente edita/remove depois). Categorias marcadas
+  // como "já tenho" no Concierge não entram. Dentro de cada categoria, aplica o filtro de estilo/faixa de
+  // preço (conforme prioridade) — se isso zerar os itens, marca semCombinacao pra mostrar o aviso na tela,
+  // e mostra a lista completa (não filtrada) só se o cliente pedir "ver todas as opções".
   const grupos = useMemo(() => {
     const out = [];
+    const criterios = { estilo: app.projetoEstilo, faixasAceitas };
+
+    function montarGrupo(categoriaId, itensBase) {
+      if (categoriasJaTem.includes(categoriaId)) return;
+      if (itensBase.length === 0) return;
+      const itensFiltrados = itensBase.filter((p) => itemCombina(p, criterios));
+      const semCombinacao = itensFiltrados.length === 0;
+      const expandido = categoriasExpandidas.includes(categoriaId);
+      // sem combinação: só mostra a lista completa depois que o cliente clica "ver todas as opções"
+      const itens = expandido ? itensBase : itensFiltrados;
+      const cat = CATEGORIAS.find((c) => c.id === categoriaId);
+      out.push({ categoriaId, categoriaNome: cat ? cat.nome : categoriaId, itens, semCombinacao: semCombinacao && !expandido, expandido });
+    }
+
     if (categoriaReformaInfo) {
       const categoriasAlvo = [...categoriaReformaInfo.categorias, "mao-de-obra"];
       for (const categoriaId of categoriasAlvo) {
         if (!PRODUTOS[categoriaId]) continue;
-        const cat = CATEGORIAS.find((c) => c.id === categoriaId);
-        const itens = PRODUTOS[categoriaId].filter((p) =>
+        const itensBase = PRODUTOS[categoriaId].filter((p) =>
           Array.isArray(p.ambientes) && p.ambientes.some((a) => app.ambientesSelecionados.includes(a)) &&
           (p.categoriaReforma === undefined || p.categoriaReforma === categoriaReformaInfo.id)
         );
-        if (itens.length > 0) out.push({ categoriaId, categoriaNome: cat ? cat.nome : categoriaId, itens });
+        montarGrupo(categoriaId, itensBase);
       }
     } else {
       for (const categoriaId of Object.keys(PRODUTOS)) {
         if (categoriaId === "mao-de-obra") continue; // mão de obra por sistema só entra no modo "categoria específica"
-        const cat = CATEGORIAS.find((c) => c.id === categoriaId);
-        const itens = PRODUTOS[categoriaId].filter((p) =>
+        const itensBase = PRODUTOS[categoriaId].filter((p) =>
           Array.isArray(p.ambientes) && p.ambientes.some((a) => app.ambientesSelecionados.includes(a))
         );
-        if (itens.length > 0) out.push({ categoriaId, categoriaNome: cat ? cat.nome : categoriaId, itens });
+        montarGrupo(categoriaId, itensBase);
       }
     }
     return out;
-  }, [app.ambientesSelecionados, categoriaReformaInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [app.ambientesSelecionados, categoriaReformaInfo, app.projetoEstilo, faixasAceitas, categoriasJaTem, categoriasExpandidas]);
 
-  // o projeto já vem com tudo que é cabível pré-selecionado no carrinho; o cliente edita/remove a partir daí.
-  // só preenche automaticamente quando o carrinho do projeto está vazio, pra não sobrescrever remoções manuais.
+  // o projeto já vem com tudo que é cabível (já filtrado por estilo/faixa) pré-selecionado no carrinho; o
+  // cliente edita/remove a partir daí. Só preenche automaticamente quando o carrinho do projeto está vazio,
+  // pra não sobrescrever remoções manuais nem reagir de novo quando o cliente clica "ver todas as opções".
   useEffect(() => {
     if (app.itensProjeto.length === 0 && grupos.length > 0) {
       grupos.forEach((g) => g.itens.forEach((p) => app.toggleItemProjeto({ ...p, categoriaId: g.categoriaId })));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grupos]);
+  }, [app.ambientesSelecionados, categoriaReformaInfo]);
 
   function estaSelecionado(p, categoriaId) {
     return app.itensProjeto.some((i) => i.id === p.id && i.categoriaId === categoriaId);
@@ -85,6 +127,12 @@ export default function Escolha() {
       {grupos.map((g) => (
         <div key={g.categoriaId}>
           <h3 className="secaoTitulo">{g.categoriaNome}</h3>
+          {g.semCombinacao && (
+            <div className="cartao alerta" style={{ marginBottom: 8 }}>
+              <p>Nenhum item de {g.categoriaNome.toLowerCase()} combina exatamente com o estilo/prioridade escolhidos. Veja as outras opções disponíveis:</p>
+              <button className="btSecundario" onClick={() => expandirCategoria(g.categoriaId)}>Ver todas as opções</button>
+            </div>
+          )}
           {g.itens.map((p) => {
             const sel = estaSelecionado(p, g.categoriaId);
             const qtd = quantidadeDe(p, g.categoriaId);

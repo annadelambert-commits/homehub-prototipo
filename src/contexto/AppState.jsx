@@ -31,6 +31,12 @@ export function AppProvider({ children }) {
   const [categoriaFoco, setCategoriaFoco] = useState(null); // id da categoria, ex.: 'pisos', quando escopoFoco === 'categoria'
   const [itensProjeto, setItensProjeto] = useState([]); // itens escolhidos no fluxo Projeto Completo (multi-seleção, com quantidade)
 
+  // Personalização do Projeto Completo — estilo/paleta/prioridade e o que o cliente já tem
+  const [projetoEstilo, setProjetoEstilo] = useState(null); // id de ESTILOS_DESIGN
+  const [projetoPaleta, setProjetoPaleta] = useState(null); // id de PALETAS_DESIGN
+  const [projetoPrioridade, setProjetoPrioridade] = useState(null); // 'custo' | 'estetica' | 'rapidez'
+  const [itensJaTem, setItensJaTem] = useState({}); // { [ambienteId]: [categoriaId, ...] } — categorias que o cliente já tem e não quer trocar
+
   // IA de Design / Render
   const [designAmbiente, setDesignAmbiente] = useState(null); // id do ambiente escolhido antes do estilo/paleta
   const [designFoto, setDesignFoto] = useState(null);
@@ -98,6 +104,13 @@ export function AppProvider({ children }) {
   function setMedidaAmbiente(ambienteId, dados) {
     setMedidasPorAmbiente((m) => ({ ...m, [ambienteId]: dados }));
   }
+  function toggleItemJaTem(ambienteId, categoriaId) {
+    setItensJaTem((m) => {
+      const atual = m[ambienteId] || [];
+      const novo = atual.includes(categoriaId) ? atual.filter((c) => c !== categoriaId) : [...atual, categoriaId];
+      return { ...m, [ambienteId]: novo };
+    });
+  }
   function concluirProjetoAtivo() {
     setProjetos((ps) => ps.map((p) => {
       if (p.id === projetoAtivoId) return { ...p, status: "concluido" };
@@ -111,6 +124,7 @@ export function AppProvider({ children }) {
     setBriefing(null); setErroConcierge(null); setAmbientesSelecionados([]); setReformaCompleta(false);
     setItensProjeto([]); setMedidasPorAmbiente({}); setPlantaCompleta(null); setAmbienteFaseInicial(null);
     setOrcamentoFinal(null); setEscopoFoco(null); setCategoriaFoco(null);
+    setProjetoEstilo(null); setProjetoPaleta(null); setProjetoPrioridade(null); setItensJaTem({});
   }
 
   return (
@@ -125,6 +139,8 @@ export function AppProvider({ children }) {
       ambienteFaseInicial, setAmbienteFaseInicial,
       orcamentoFinal, setOrcamentoFinal, escopoFoco, setEscopoFoco, categoriaFoco, setCategoriaFoco,
       itensProjeto, setItensProjeto, toggleItemProjeto, setQuantidadeItem, totalItensProjeto, descontoPacote,
+      projetoEstilo, setProjetoEstilo, projetoPaleta, setProjetoPaleta, projetoPrioridade, setProjetoPrioridade,
+      itensJaTem, setItensJaTem, toggleItemJaTem,
       designAmbiente, setDesignAmbiente,
       designFoto, setDesignFoto, designEstilo, setDesignEstilo, designPaleta, setDesignPaleta,
       designResultado, setDesignResultado, designErro, setDesignErro,

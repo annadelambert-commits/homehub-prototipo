@@ -3,7 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { House, LayoutGrid, Layers, Wrench, CircleCheck, Puzzle } from "lucide-react";
 import { useApp } from "../../contexto/AppState";
 import AppFrame from "../../componentes/AppFrame";
-import { AMBIENTES, CATEGORIAS_REFORMA, INCENTIVO_FASEADO } from "../../dados/homehub";
+import { AMBIENTES, CATEGORIAS_REFORMA, INCENTIVO_FASEADO, ESTILOS_DESIGN, PALETAS_DESIGN, JA_TENHO_OPCOES, PRODUTOS } from "../../dados/homehub";
+
+const PRIORIDADES = [
+  { id: "custo", titulo: "Custo-benefício", sub: "Quero o melhor preço, sem abrir mão do essencial" },
+  { id: "estetica", titulo: "Acabamento e estética", sub: "Prefiro pagar mais por acabamento e visual melhores" },
+  { id: "rapidez", titulo: "Rapidez de entrega", sub: "Quero o que estiver disponível mais rápido" },
+];
 
 const TIPOS_REFORMA = [
   { id: "unico", Icone: LayoutGrid, titulo: "Um ambiente", sub: "Reformar um cômodo específico" },
@@ -20,6 +26,14 @@ function encontrarAmbientePorTexto(texto) {
   const norm = texto.toLowerCase();
   const candidatos = [...AMBIENTES].sort((a, b) => b.nome.length - a.nome.length);
   return candidatos.find((a) => norm.includes(a.nome.toLowerCase())) || null;
+}
+
+// mesma lógica pro estilo: só usa o que a IA leu no texto livre pra completar a escolha quando o
+// cliente não marcou nenhum chip de estilo — o chip, quando existe, é o sinal mais confiável.
+function encontrarEstiloPorTexto(texto) {
+  if (!texto) return null;
+  const norm = texto.toLowerCase();
+  return ESTILOS_DESIGN.find((e) => norm.includes(e.nome.toLowerCase()) || norm.includes(e.id)) || null;
 }
 
 export default function Concierge() {
@@ -56,6 +70,11 @@ export default function Concierge() {
       if (tipoReforma !== "categoria") {
         app.setEscopoFoco(dados.escopo === "categoria" ? "categoria" : "completo");
         app.setCategoriaFoco(dados.escopo === "categoria" ? dados.categoria : null);
+      }
+      // se o cliente não marcou nenhum chip de estilo, mas descreveu um estilo no texto livre, usa o que a IA leu
+      if (!app.projetoEstilo && dados.estilo) {
+        const estiloDetectado = encontrarEstiloPorTexto(dados.estilo);
+        if (estiloDetectado) app.setProjetoEstilo(estiloDetectado.id);
       }
     } catch {
       app.setErroConcierge("Não foi possível falar com o concierge agora. Confira a chave da API no Netlify, ou use o exemplo pronto abaixo.");
@@ -95,9 +114,10 @@ export default function Concierge() {
   }
 
   function usarExemplo() {
+    const estiloNome = ESTILOS_DESIGN.find((e) => e.id === app.projetoEstilo)?.nome || "moderno";
     app.setBriefing({
-      ambiente: nomeAmbientes, orcamento: orcTotal, estilo: "moderno", prazo_dias: 45, prioridade: "funcionalidade",
-      resumo: `Entendi: reforma de ${nomeAmbientes}, estilo moderno, orçamento de R$ ${orcTotal.toLocaleString("pt-BR")}, prazo de 45 dias e foco em funcionalidade.`,
+      ambiente: nomeAmbientes, orcamento: orcTotal, estilo: estiloNome, prazo_dias: 45, prioridade: "funcionalidade",
+      resumo: `Entendi: reforma de ${nomeAmbientes}, estilo ${estiloNome}, orçamento de R$ ${orcTotal.toLocaleString("pt-BR")}, prazo de 45 dias e foco em funcionalidade.`,
     });
     if (tipoReforma !== "categoria") { app.setEscopoFoco("completo"); app.setCategoriaFoco(null); }
     app.setErroConcierge(null);
@@ -106,6 +126,15 @@ export default function Concierge() {
   function irParaMedida() {
     nav("/projeto-completo/medida");
   }
+
+  // só mostra no checklist "já tenho" as categorias que de fato têm item cadastrado pra algum dos
+  // ambientes escolhidos — não faz sentido perguntar se o cliente "já tem" organização se não vamos
+  // sugerir nenhum item de organização pra esse ambiente.
+  const jaTenhoOpcoesRelevantes = JA_TENHO_OPCOES.filter((op) =>
+    PRODUTOS[op.categoriaId]?.some((p) => Array.isArray(p.ambientes) && p.ambientes.some((a) => app.ambientesSelecionados.includes(a)))
+  );
+  function chaveJaTem() { return app.ambientesSelecionados.join("+") || "geral"; }
+  const jaTenhoSelecionados = app.itensJaTem[chaveJaTem()] || [];
 
   function escolherOrcamentoFinal() {
     app.setOrcamentoFinal(true);
@@ -211,9 +240,50 @@ export default function Concierge() {
       <h2 className="tituloTela">Conte como quer sua reforma de {nomeAmbientes}</h2>
       {!app.briefing && (
         <>
-          <p className="subtituloTela">Descreva com suas palavras: orçamento, estilo, o que for importante. A IA organiza isso num projeto.</p>
+          <p className="subtituloTela">Antes de descrever com suas palavras, escolha o que já sabemos sobre o seu gosto — isso ajuda a IA a montar um carrinho que combina com você.</p>
+
+          <h3 className="secaoTitulo">Qual estilo mais te representa?</h3>
+          <div className="gradeAmbientes">
+            {ESTILOS_DESIGN.map((e) => (
+              <button key={e.id} className={"ambienteChip" + (app.projetoEstilo === e.id ? " sel" : "")}
+                onClick={() => app.setProjetoEstilo(app.projetoEstilo === e.id ? null : e.id)}>{e.nome}</button>
+            ))}
+          </div>
+
+          <h3 className="secaoTitulo">E a paleta de cores?</h3>
+          <div className="gradeAmbientes">
+            {PALETAS_DESIGN.map((p) => (
+              <button key={p.id} className={"ambienteChip" + (app.projetoPaleta === p.id ? " sel" : "")}
+                onClick={() => app.setProjetoPaleta(app.projetoPaleta === p.id ? null : p.id)}>{p.nome}</button>
+            ))}
+          </div>
+
+          <h3 className="secaoTitulo">O que pesa mais pra você?</h3>
+          <div className="gradeAmbientes">
+            {PRIORIDADES.map((pr) => (
+              <button key={pr.id} className={"ambienteChip" + (app.projetoPrioridade === pr.id ? " sel" : "")}
+                onClick={() => app.setProjetoPrioridade(app.projetoPrioridade === pr.id ? null : pr.id)}
+                title={pr.sub}>{pr.titulo}</button>
+            ))}
+          </div>
+
+          {jaTenhoOpcoesRelevantes.length > 0 && (
+            <>
+              <h3 className="secaoTitulo">Você já tem algo que não precisa trocar?</h3>
+              <p className="subtituloTela">Marque o que já está pronto — a gente não sugere item novo pra isso.</p>
+              <div className="gradeAmbientes">
+                {jaTenhoOpcoesRelevantes.map((op) => (
+                  <button key={op.categoriaId} className={"ambienteChip" + (jaTenhoSelecionados.includes(op.categoriaId) ? " sel" : "")}
+                    onClick={() => app.toggleItemJaTem(chaveJaTem(), op.categoriaId)}>{op.label}</button>
+                ))}
+              </div>
+            </>
+          )}
+
+          <h3 className="secaoTitulo">Restrições ou preferências especiais (opcional)</h3>
+          <p className="subtituloTela">Descreva com suas palavras: orçamento, o que for importante. A IA organiza isso num projeto.</p>
           <textarea className="chatInput" rows={4} value={texto} onChange={(e) => setTexto(e.target.value)}
-            placeholder={`Ex.: Quero reformar ${nomeAmbientes}, algo moderno, com bastante espaço de armazenamento.`} />
+            placeholder={`Ex.: Quero reformar ${nomeAmbientes}, com bastante espaço de armazenamento, orçamento de R$ ${orcTotal.toLocaleString("pt-BR")}.`} />
           <div className="ctaFixo">
             <button className="btPrimario" disabled={!texto.trim() || carregando} onClick={enviarConcierge}>
               {carregando ? "Consultando a IA…" : "Enviar para o concierge"}
@@ -230,6 +300,12 @@ export default function Concierge() {
             <div className="linhaResumo"><span>Ambiente(s)</span><b>{app.briefing.ambiente}</b></div>
             <div className="linhaResumo"><span>Orçamento</span><b>{app.briefing.orcamento ? "R$ " + app.briefing.orcamento.toLocaleString("pt-BR") : "não informado"}</b></div>
             <div className="linhaResumo"><span>Estilo</span><b>{app.briefing.estilo || "não informado"}</b></div>
+            {app.projetoPaleta && (
+              <div className="linhaResumo"><span>Paleta de cores</span><b>{PALETAS_DESIGN.find((p) => p.id === app.projetoPaleta)?.nome}</b></div>
+            )}
+            {app.projetoPrioridade && (
+              <div className="linhaResumo"><span>Prioridade</span><b>{PRIORIDADES.find((p) => p.id === app.projetoPrioridade)?.titulo}</b></div>
+            )}
             <div className="linhaResumo"><span>Prazo desejado</span><b>{app.briefing.prazo_dias ? app.briefing.prazo_dias + " dias" : "não informado"}</b></div>
           </div>
 
