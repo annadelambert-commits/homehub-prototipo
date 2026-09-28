@@ -158,7 +158,7 @@ export default function MoveisPlanejados() {
             <span>Imagem ou PDF</span>
             <input type="file" accept="image/*,.pdf" style={{ display: "none" }} onChange={(e) => onArquivo(e, "planta")} />
           </label>
-          <label className="rotuloSecao">Medidas do ambiente (cm), opcional</label>
+          <label className="rotuloSecao">Medidas do espaço do móvel (cm), opcional</label>
           <div className="linhaMedidas">
             <input type="number" placeholder="Largura" value={medidas.largura} onChange={(e) => setMedidas({ ...medidas, largura: e.target.value })} />
             <input type="number" placeholder="Profund." value={medidas.profundidade} onChange={(e) => setMedidas({ ...medidas, profundidade: e.target.value })} />
@@ -172,13 +172,17 @@ export default function MoveisPlanejados() {
 
       {passo === PASSO.MANUAL && (
         <>
-          <h2 className="tituloTela">Medidas do ambiente</h2>
-          <p className="subtituloTela">Como é um projeto completo, informe as medidas do ambiente inteiro (não só do móvel).</p>
-          <label className="rotuloSecao">Largura da parede principal (cm)</label>
+          <h2 className="tituloTela">Medidas do espaço do móvel</h2>
+          <p className="subtituloTela">
+            {preSelecionado
+              ? `Não precisa medir o ambiente inteiro — só o vão onde ${preSelecionado.nome} vai ficar: a parede ou o espaço livre disponível para o móvel.`
+              : "Móvel planejado é feito sob medida pro espaço dele, não pro ambiente inteiro. Informe a largura, profundidade e altura do vão disponível."}
+          </p>
+          <label className="rotuloSecao">Largura do vão disponível (cm)</label>
           <input className="inputCheio" type="number" placeholder="Ex.: 320" value={medidas.largura} onChange={(e) => setMedidas({ ...medidas, largura: e.target.value })} />
-          <label className="rotuloSecao">Profundidade do ambiente (cm)</label>
+          <label className="rotuloSecao">Profundidade do espaço (cm)</label>
           <input className="inputCheio" type="number" placeholder="Ex.: 250" value={medidas.profundidade} onChange={(e) => setMedidas({ ...medidas, profundidade: e.target.value })} />
-          <label className="rotuloSecao">Pé-direito / altura (cm)</label>
+          <label className="rotuloSecao">Pé-direito / altura disponível (cm)</label>
           <input className="inputCheio" type="number" placeholder="Ex.: 270" value={medidas.altura} onChange={(e) => setMedidas({ ...medidas, altura: e.target.value })} />
           <div className="ctaFixo">
             <button className="btPrimario" disabled={!medidas.largura || !medidas.altura} onClick={confirmarManual}>Confirmar medidas</button>
