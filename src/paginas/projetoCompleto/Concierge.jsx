@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { House, LayoutGrid, Layers, Wrench, CircleCheck, Puzzle } from "lucide-react";
 import { useApp } from "../../contexto/AppState";
 import AppFrame from "../../componentes/AppFrame";
-import { AMBIENTES, INCENTIVO_FASEADO } from "../../dados/homehub";
+import { AMBIENTES, CATEGORIAS_REFORMA, INCENTIVO_FASEADO } from "../../dados/homehub";
+
+const TIPOS_REFORMA = [
+  { id: "unico", Icone: LayoutGrid, titulo: "Um ambiente", sub: "Reformar um cômodo específico" },
+  { id: "multi", Icone: Layers, titulo: "Vários ambientes", sub: "Escolher mais de um cômodo, do jeito que você quiser" },
+  { id: "completa", Icone: House, titulo: "Casa completa", sub: "Todos os ambientes, com desconto de reforma completa" },
+  { id: "categoria", Icone: Wrench, titulo: "Uma categoria específica", sub: "Ex.: só o piso, só a parte elétrica, só a hidráulica" },
+];
 
 export default function Concierge() {
   const nav = useNavigate();
@@ -10,6 +18,7 @@ export default function Concierge() {
   const [texto, setTexto] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [avancou, setAvancou] = useState(app.ambientesSelecionados.length > 0);
+  const [tipoReforma, setTipoReforma] = useState(null);
 
   async function enviarConcierge() {
     if (!texto.trim()) return;
@@ -23,14 +32,20 @@ export default function Concierge() {
       const dados = await resp.json();
       if (!dados.ambiente) throw new Error("resposta incompleta");
       app.setBriefing(dados);
-      app.setEscopoFoco(dados.escopo === "categoria" ? "categoria" : "completo");
-      app.setCategoriaFoco(dados.escopo === "categoria" ? dados.categoria : null);
+      // se o cliente já escolheu explicitamente "categoria específica" nos botões, isso vale mais que a
+      // leitura da IA sobre o texto livre — só deixa a IA decidir o escopo nos outros formatos de reforma
+      if (tipoReforma !== "categoria") {
+        app.setEscopoFoco(dados.escopo === "categoria" ? "categoria" : "completo");
+        app.setCategoriaFoco(dados.escopo === "categoria" ? dados.categoria : null);
+      }
     } catch {
       app.setErroConcierge("Não foi possível falar com o concierge agora. Confira a chave da API no Netlify, ou use o exemplo pronto abaixo.");
     } finally {
       setCarregando(false);
     }
   }
+
+  const [categoriaEscolhida, setCategoriaEscolhida] = useState(null);
 
   const selecionados = AMBIENTES.filter((a) => app.ambientesSelecionados.includes(a.id));
   const nomeAmbientes = selecionados.map((a) => a.nome.toLowerCase()).join(", ");
@@ -40,11 +55,18 @@ export default function Concierge() {
     app.setAmbientesSelecionados((sel) => sel.includes(id) ? sel.filter((s) => s !== id) : [...sel, id]);
   }
 
-  function escolherTodos() {
-    const todos = AMBIENTES.map((a) => a.id);
-    const jaTodos = todos.every((id) => app.ambientesSelecionados.includes(id));
-    app.setAmbientesSelecionados(jaTodos ? [] : todos);
-    app.setReformaCompleta(!jaTodos);
+  function escolherTipoReforma(id) {
+    setTipoReforma(id);
+    app.setEscopoFoco(id === "categoria" ? "categoria" : "completo");
+    if (id === "unico") { app.setAmbientesSelecionados([]); app.setReformaCompleta(false); app.setCategoriaFoco(null); }
+    else if (id === "multi") { app.setAmbientesSelecionados([]); app.setReformaCompleta(false); app.setCategoriaFoco(null); }
+    else if (id === "completa") { app.setAmbientesSelecionados(AMBIENTES.map((a) => a.id)); app.setReformaCompleta(true); app.setCategoriaFoco(null); }
+    else if (id === "categoria") { app.setAmbientesSelecionados([]); app.setReformaCompleta(false); setCategoriaEscolhida(null); }
+  }
+
+  function escolherCategoriaReforma(cat) {
+    setCategoriaEscolhida(cat);
+    app.setCategoriaFoco(cat.id);
   }
 
   function confirmarAmbientes() {
@@ -58,7 +80,7 @@ export default function Concierge() {
       ambiente: nomeAmbientes, orcamento: orcTotal, estilo: "moderno", prazo_dias: 45, prioridade: "funcionalidade",
       resumo: `Entendi: reforma de ${nomeAmbientes}, estilo moderno, orçamento de R$ ${orcTotal.toLocaleString("pt-BR")}, prazo de 45 dias e foco em funcionalidade.`,
     });
-    app.setEscopoFoco("completo"); app.setCategoriaFoco(null);
+    if (tipoReforma !== "categoria") { app.setEscopoFoco("completo"); app.setCategoriaFoco(null); }
     app.setErroConcierge(null);
   }
 
@@ -81,31 +103,84 @@ export default function Concierge() {
     irParaMedida();
   }
 
-  // ---- passo 0: quais ambientes, e se é reforma completa por etapas ----
-  if (!avancou) {
+  // ---- passo 0a: que tipo de reforma ----
+  if (!avancou && !tipoReforma) {
     return (
       <AppFrame titulo="Projeto Completo" comNavInferior={false}>
         <div className="passoIndicador"><i className="ativo" /><i /><i /><i /><i /></div>
-        <h2 className="tituloTela">Por onde você quer começar?</h2>
-        <p className="subtituloTela">Escolha um ou mais ambientes desta etapa. Dá pra reformar a casa inteira, aos poucos.</p>
+        <h2 className="tituloTela">O que você quer reformar?</h2>
+        <p className="subtituloTela">Escolha o formato que melhor descreve sua reforma. Dá pra mudar de ideia depois.</p>
 
-        <div className="gradeAmbientes">
-          {AMBIENTES.map((a) => (
-            <button key={a.id} className={"ambienteChip" + (app.ambientesSelecionados.includes(a.id) ? " sel" : "")}
-              onClick={() => toggleAmbiente(a.id)}>{a.nome}</button>
-          ))}
-          <button className={"ambienteChip destaque" + (app.reformaCompleta ? " sel" : "")} onClick={escolherTodos}>
-            🏠 Casa toda
+        {TIPOS_REFORMA.map((t) => (
+          <button key={t.id} className="opcaoMedida" onClick={() => escolherTipoReforma(t.id)}>
+            <span className="opcaoMedidaIcone"><t.Icone size={20} strokeWidth={1.6} /></span>
+            <span className="opcaoMedidaTexto"><b>{t.titulo}</b><span>{t.sub}</span></span>
           </button>
-        </div>
+        ))}
 
         <div className="cartao bom" style={{ marginTop: 4 }}>
           <h4>Reforma completa custa menos, mesmo em etapas</h4>
           <p>{INCENTIVO_FASEADO.texto} Você decide o ritmo, de acordo com orçamento e crédito disponíveis. Nenhum ambiente fica bloqueado.</p>
         </div>
+      </AppFrame>
+    );
+  }
+
+  // ---- passo 0b: categoria específica (piso, hidráulica, elétrica, pintura) ----
+  if (!avancou && tipoReforma === "categoria" && !categoriaEscolhida) {
+    return (
+      <AppFrame titulo="Projeto Completo" voltar={() => setTipoReforma(null)} comNavInferior={false}>
+        <div className="passoIndicador"><i className="ativo" /><i /><i /><i /><i /></div>
+        <h2 className="tituloTela">Qual categoria você quer reformar?</h2>
+        <p className="subtituloTela">Ao escolher, já reunimos material e mão de obra necessários pra essa frente.</p>
+        <div className="gradeAmbientes">
+          {CATEGORIAS_REFORMA.map((c) => (
+            <button key={c.id} className="ambienteChip" onClick={() => escolherCategoriaReforma(c)}>{c.nome}</button>
+          ))}
+        </div>
+      </AppFrame>
+    );
+  }
+
+  // ---- passo 0c: quais ambientes recebem essa reforma (único, multi ou categoria) ----
+  if (!avancou && (tipoReforma === "unico" || tipoReforma === "multi" || (tipoReforma === "categoria" && categoriaEscolhida))) {
+    const unico = tipoReforma === "unico";
+    return (
+      <AppFrame titulo="Projeto Completo" voltar={() => { if (tipoReforma === "categoria") setCategoriaEscolhida(null); else setTipoReforma(null); }} comNavInferior={false}>
+        <div className="passoIndicador"><i className="ativo" /><i /><i /><i /><i /></div>
+        <h2 className="tituloTela">
+          {unico ? "Qual ambiente?" : tipoReforma === "categoria" ? `${categoriaEscolhida.nome}: em quais ambientes?` : "Quais ambientes?"}
+        </h2>
+        <p className="subtituloTela">{unico ? "Escolha o cômodo que você quer reformar." : "Escolha um ou mais ambientes."}</p>
+
+        <div className="gradeAmbientes">
+          {AMBIENTES.map((a) => (
+            <button key={a.id} className={"ambienteChip" + (app.ambientesSelecionados.includes(a.id) ? " sel" : "")}
+              onClick={() => unico ? app.setAmbientesSelecionados([a.id]) : toggleAmbiente(a.id)}>{a.nome}</button>
+          ))}
+        </div>
 
         <div className="ctaFixo">
-          <button className="btPrimario" disabled={selecionados.length === 0} onClick={confirmarAmbientes}>Continuar</button>
+          <button className="btPrimario" disabled={app.ambientesSelecionados.length === 0} onClick={confirmarAmbientes}>Continuar</button>
+        </div>
+      </AppFrame>
+    );
+  }
+
+  // ---- passo 0d: casa completa já confirma direto ----
+  if (!avancou && tipoReforma === "completa") {
+    return (
+      <AppFrame titulo="Projeto Completo" voltar={() => setTipoReforma(null)} comNavInferior={false}>
+        <div className="passoIndicador"><i className="ativo" /><i /><i /><i /><i /></div>
+        <h2 className="tituloTela">Casa completa</h2>
+        <p className="subtituloTela">Todos os ambientes entram no projeto, com o maior desconto de pacote fechado.</p>
+        <div className="gradeAmbientes">
+          {AMBIENTES.map((a) => (
+            <button key={a.id} className="ambienteChip sel" style={{ pointerEvents: "none" }}>{a.nome}</button>
+          ))}
+        </div>
+        <div className="ctaFixo">
+          <button className="btPrimario" onClick={confirmarAmbientes}>Continuar</button>
         </div>
       </AppFrame>
     );
@@ -154,11 +229,11 @@ export default function Concierge() {
                 um preço agora com desconto e reformar em etapas, começando por um ambiente?
               </p>
               <button className="opcaoMedida" onClick={escolherOrcamentoFinal}>
-                <span className="opcaoMedidaIcone">✅</span>
+                <span className="opcaoMedidaIcone"><CircleCheck size={20} strokeWidth={1.6} /></span>
                 <span className="opcaoMedidaTexto"><b>É o orçamento final</b><span>Fechamos {nomeAmbientes} de uma vez só</span></span>
               </button>
               <button className="opcaoMedida" onClick={escolherFaseado}>
-                <span className="opcaoMedidaIcone">🧩</span>
+                <span className="opcaoMedidaIcone"><Puzzle size={20} strokeWidth={1.6} /></span>
                 <span className="opcaoMedidaTexto"><b>Quero fazer em etapas</b><span>{INCENTIVO_FASEADO.texto}</span></span>
               </button>
             </>

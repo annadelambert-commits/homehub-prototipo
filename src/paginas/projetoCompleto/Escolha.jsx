@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../contexto/AppState";
 import AppFrame from "../../componentes/AppFrame";
-import { PRODUTOS, CATEGORIAS, AMBIENTES } from "../../dados/homehub";
+import { PRODUTOS, CATEGORIAS, CATEGORIAS_REFORMA, AMBIENTES } from "../../dados/homehub";
 
 function brl0(v) { return "R$ " + Math.round(v).toLocaleString("pt-BR"); }
 
@@ -14,22 +14,45 @@ export default function Escolha() {
     .map((a) => a.nome.toLowerCase()).join(", ") || "seu ambiente";
 
   const focoCategoria = app.escopoFoco === "categoria" && app.categoriaFoco;
+  const categoriaReformaInfo = focoCategoria ? CATEGORIAS_REFORMA.find((c) => c.id === app.categoriaFoco) : null;
 
-  // agrupa por categoria só os itens relevantes para os ambientes escolhidos; se o concierge detectou um
-  // pedido específico (ex.: "só o piso"), mostra só aquela categoria, pra todos os ambientes selecionados
+  // agrupa por categoria os itens relevantes para os ambientes escolhidos. No modo "reforma por categoria"
+  // (ex.: só o piso), já reúne material + mão de obra daquela frente; no modo geral, tudo que é cabível
+  // pros ambientes escolhidos entra automaticamente (o cliente edita/remove depois).
   const grupos = useMemo(() => {
     const out = [];
-    const categoriasAlvo = focoCategoria ? [app.categoriaFoco] : Object.keys(PRODUTOS);
-    for (const categoriaId of categoriasAlvo) {
-      if (!PRODUTOS[categoriaId]) continue;
-      const cat = CATEGORIAS.find((c) => c.id === categoriaId);
-      const itens = PRODUTOS[categoriaId].filter((p) =>
-        Array.isArray(p.ambientes) && p.ambientes.some((a) => app.ambientesSelecionados.includes(a))
-      );
-      if (itens.length > 0) out.push({ categoriaId, categoriaNome: cat ? cat.nome : categoriaId, itens });
+    if (categoriaReformaInfo) {
+      const categoriasAlvo = [...categoriaReformaInfo.categorias, "mao-de-obra"];
+      for (const categoriaId of categoriasAlvo) {
+        if (!PRODUTOS[categoriaId]) continue;
+        const cat = CATEGORIAS.find((c) => c.id === categoriaId);
+        const itens = PRODUTOS[categoriaId].filter((p) =>
+          Array.isArray(p.ambientes) && p.ambientes.some((a) => app.ambientesSelecionados.includes(a)) &&
+          (p.categoriaReforma === undefined || p.categoriaReforma === categoriaReformaInfo.id)
+        );
+        if (itens.length > 0) out.push({ categoriaId, categoriaNome: cat ? cat.nome : categoriaId, itens });
+      }
+    } else {
+      for (const categoriaId of Object.keys(PRODUTOS)) {
+        if (categoriaId === "mao-de-obra") continue; // mão de obra por sistema só entra no modo "categoria específica"
+        const cat = CATEGORIAS.find((c) => c.id === categoriaId);
+        const itens = PRODUTOS[categoriaId].filter((p) =>
+          Array.isArray(p.ambientes) && p.ambientes.some((a) => app.ambientesSelecionados.includes(a))
+        );
+        if (itens.length > 0) out.push({ categoriaId, categoriaNome: cat ? cat.nome : categoriaId, itens });
+      }
     }
     return out;
-  }, [app.ambientesSelecionados, focoCategoria, app.categoriaFoco]);
+  }, [app.ambientesSelecionados, categoriaReformaInfo]);
+
+  // o projeto já vem com tudo que é cabível pré-selecionado no carrinho; o cliente edita/remove a partir daí.
+  // só preenche automaticamente quando o carrinho do projeto está vazio, pra não sobrescrever remoções manuais.
+  useEffect(() => {
+    if (app.itensProjeto.length === 0 && grupos.length > 0) {
+      grupos.forEach((g) => g.itens.forEach((p) => app.toggleItemProjeto({ ...p, categoriaId: g.categoriaId })));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grupos]);
 
   function estaSelecionado(p, categoriaId) {
     return app.itensProjeto.some((i) => i.id === p.id && i.categoriaId === categoriaId);
@@ -52,11 +75,11 @@ export default function Escolha() {
   return (
     <AppFrame titulo="Projeto Completo" comNavInferior={false}>
       <div className="passoIndicador"><i className="feito" /><i className="feito" /><i className="ativo" /><i /><i /></div>
-      <h2 className="tituloTela">{focoCategoria ? `Opções de ${CATEGORIAS.find((c) => c.id === app.categoriaFoco)?.nome.toLowerCase() || "itens"} para ${nomeAmbientes}` : `Monte o projeto de ${nomeAmbientes}`}</h2>
+      <h2 className="tituloTela">{categoriaReformaInfo ? `${categoriaReformaInfo.nome} para ${nomeAmbientes}` : `Seu projeto de ${nomeAmbientes}`}</h2>
       <p className="subtituloTela">
-        {focoCategoria
-          ? "Você pediu algo específico, então trouxemos só essa frente. Se quiser, dá pra ampliar o projeto depois."
-          : "Selecione tudo que você quer incluir: móveis, revestimentos, iluminação e decoração. Dá pra ajustar a quantidade de cada item."}
+        {categoriaReformaInfo
+          ? "Já reunimos o material e a mão de obra dessa frente. Você pode remover ou ajustar qualquer item."
+          : "Já reunimos tudo que é necessário pra esse projeto. Remova ou ajuste a quantidade do que não quiser."}
       </p>
 
       {grupos.map((g) => (

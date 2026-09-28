@@ -31,6 +31,17 @@ export const CATEGORIAS = [
   { id: "jardim", nome: "Jardim", img: IMG.jardim },
   { id: "ferramentas", nome: "Ferramentas", img: IMG.ferramentas },
   { id: "materiais", nome: "Materiais de Construção", cor: "#C7C2BC" },
+  { id: "hidraulica", nome: "Hidráulica", cor: "#AEC6CF" },
+  { id: "eletrica", nome: "Elétrica", cor: "#E0C68E" },
+  { id: "mao-de-obra", nome: "Mão de Obra", cor: "#CBCBCB" },
+];
+
+// Reforma por categoria: cada tipo de reforma específica reúne material + mão de obra automaticamente.
+export const CATEGORIAS_REFORMA = [
+  { id: "piso", nome: "Piso e revestimento", categorias: ["pisos", "materiais"], maoDeObraCategoria: "piso" },
+  { id: "hidraulica", nome: "Hidráulica", categorias: ["hidraulica"], maoDeObraCategoria: "hidraulica" },
+  { id: "eletrica", nome: "Elétrica", categorias: ["eletrica"], maoDeObraCategoria: "eletrica" },
+  { id: "pintura", nome: "Pintura", categorias: ["materiais"], maoDeObraCategoria: "pintura" },
 ];
 
 export const IMG_HERO = IMG.hero;
@@ -69,6 +80,26 @@ export const PRODUTOS = {
     { id: 30, nome: "Gabinete Suspenso 80cm", valor: 1450, desc: "MDF laqueado, cuba esculpida.", cor: "#B7C4D6", ambientes: ["banheiro"] },
     { id: 31, nome: "Chuveiro Eletrônico", valor: 380, desc: "4 temperaturas, 7500W.", cor: "#B7C4D6", ambientes: ["banheiro"] },
   ],
+  "hidraulica": [
+    { id: 120, nome: "Vaso Sanitário com Caixa Acoplada", valor: 890, desc: "Louça branca, sistema dual flush.", cor: "#AEC6CF", ambientes: ["banheiro"] },
+    { id: 121, nome: "Box de Vidro Temperado (Blindex)", valor: 1290, unidade: "un", desc: "Incolor, 8mm, instalação sob medida.", cor: "#AEC6CF", ambientes: ["banheiro"] },
+    { id: 122, nome: "Torneira de Mesa para Banheiro", valor: 340, desc: "Monocomando, acabamento cromado.", cor: "#AEC6CF", ambientes: ["banheiro"] },
+    { id: 123, nome: "Torneira de Cozinha com Bica Móvel", valor: 420, desc: "Monocomando, alta pressão.", cor: "#AEC6CF", ambientes: ["cozinha"] },
+    { id: 124, nome: "Registro de Gaveta 3/4", valor: 95, desc: "Metal cromado, para chuveiro ou torneira.", cor: "#AEC6CF", ambientes: ["banheiro", "cozinha"] },
+    { id: 125, nome: "Pia de Cozinha em Inox", valor: 680, desc: "Cuba dupla, com válvulas.", cor: "#AEC6CF", ambientes: ["cozinha"] },
+  ],
+  "eletrica": [
+    { id: 130, nome: "Quadro de Disjuntores 12 Circuitos", valor: 420, desc: "Com disjuntor DR, padrão NBR.", cor: "#E0C68E", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
+    { id: 131, nome: "Kit Tomadas e Interruptores", valor: 189, unidade: "kit 5un", desc: "Linha branca, instalação embutida.", cor: "#E0C68E", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
+    { id: 132, nome: "Fiação Elétrica 2,5mm", valor: 6, unidade: "m", desc: "Cabo flexível, antichama.", cor: "#E0C68E", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
+    { id: 133, nome: "Ponto de Tomada Extra", valor: 145, unidade: "un", desc: "Inclui fiação e acabamento.", cor: "#E0C68E", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
+  ],
+  "mao-de-obra": [
+    { id: 140, nome: "Mão de Obra — Instalação de Piso", valor: 38, unidade: "m²", desc: "Assentamento e rejunte, por executor certificado.", cor: "#CBCBCB", ambientes: ["cozinha", "banheiro", "sala", "quarto"], categoriaReforma: "piso" },
+    { id: 141, nome: "Mão de Obra — Serviço Hidráulico", valor: 620, desc: "Instalação e adequação de pontos hidráulicos do ambiente.", cor: "#CBCBCB", ambientes: ["cozinha", "banheiro", "sala", "quarto"], categoriaReforma: "hidraulica" },
+    { id: 142, nome: "Mão de Obra — Serviço Elétrico", valor: 540, desc: "Instalação e adequação de pontos elétricos do ambiente.", cor: "#CBCBCB", ambientes: ["cozinha", "banheiro", "sala", "quarto"], categoriaReforma: "eletrica" },
+    { id: 143, nome: "Mão de Obra — Pintura", valor: 22, unidade: "m²", desc: "Preparo de parede e duas demãos de tinta.", cor: "#CBCBCB", ambientes: ["cozinha", "banheiro", "sala", "quarto"], categoriaReforma: "pintura" },
+  ],
   "decoracao": [
     { id: 40, nome: "Tapete Trama Natural 2×3m", valor: 890, desc: "Fibra natural, pronto-entrega.", img: IMG.decoracao, ambientes: ["sala", "quarto"] },
     { id: 41, nome: "Luminária de Piso Arco", valor: 640, desc: "Estrutura em metal, cúpula em linho.", img: IMG.decoracao, ambientes: ["sala", "quarto"] },
@@ -100,10 +131,11 @@ export const PRODUTOS = {
     { id: 100, nome: "Furadeira de Impacto 750W", valor: 349, desc: "Kit com 20 acessórios.", img: IMG.ferramentas },
   ],
   "materiais": [
-    { id: 110, nome: "Cimento CP-II 50kg", valor: 42, desc: "Saco, uso geral.", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
-    { id: 111, nome: "Argamassa AC-II 20kg", valor: 36, desc: "Assentamento de porcelanato e revestimentos.", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
-    { id: 112, nome: "Tinta Acrílica Premium 18L", valor: 389, desc: "Fosca, lavável, cobertura de até 300m².", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
-    { id: 113, nome: "Massa Corrida para Parede 25kg", valor: 68, desc: "Preparo de parede antes da pintura.", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"] },
+    { id: 110, nome: "Cimento CP-II 50kg", valor: 42, desc: "Saco, uso geral.", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"], categoriaReforma: "piso" },
+    { id: 111, nome: "Argamassa AC-II 20kg", valor: 36, desc: "Assentamento de porcelanato e revestimentos.", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"], categoriaReforma: "piso" },
+    { id: 112, nome: "Tinta Acrílica Premium 18L", valor: 389, desc: "Fosca, lavável, cobertura de até 300m².", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"], categoriaReforma: "pintura" },
+    { id: 113, nome: "Massa Corrida para Parede 25kg", valor: 68, desc: "Preparo de parede antes da pintura.", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"], categoriaReforma: "pintura" },
+    { id: 114, nome: "Rejunte Flexível 5kg", valor: 39, desc: "Para porcelanato e cerâmica, resistente à umidade.", cor: "#C7C2BC", ambientes: ["cozinha", "banheiro", "sala", "quarto"], categoriaReforma: "piso" },
   ],
 };
 

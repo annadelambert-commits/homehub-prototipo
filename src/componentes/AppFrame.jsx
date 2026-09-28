@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { CircleUserRound, ShoppingCart } from "lucide-react";
 import { useApp } from "../contexto/AppState";
 import SuporteBotao from "./SuporteBotao";
 import BottomNav from "./BottomNav";
@@ -20,10 +21,10 @@ export default function AppFrame({ titulo, voltar, children, comNavInferior = tr
         <span className="tituloTopo">{titulo}</span>
         <div className="acoesTopo">
           <button className="iconeTopo" onClick={() => nav("/perfil")} aria-label="Perfil">
-            {app.usuario ? "👤" : "◯"}
+            <CircleUserRound size={19} strokeWidth={1.7} />
           </button>
           <button className="iconeTopo carrinhoIcone" onClick={() => nav("/carrinho")} aria-label="Carrinho">
-            🛒
+            <ShoppingCart size={19} strokeWidth={1.7} />
             {app.carrinho.length > 0 && <span className="badge">{app.carrinho.length}</span>}
           </button>
         </div>

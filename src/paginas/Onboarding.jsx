@@ -1,19 +1,20 @@
 import { useNavigate } from "react-router-dom";
+import { Sparkles, LayoutGrid, Package, Ruler, MessageCircle, Tag } from "lucide-react";
 import { useApp } from "../contexto/AppState";
 import AppFrame from "../componentes/AppFrame";
 
 const OPCOES = [
-  { id: "render", icone: "🎨", titulo: "Ainda não sei por onde começar",
+  { id: "render", Icone: Sparkles, titulo: "Ainda não sei por onde começar",
     sub: "Fotografe o ambiente e veja um render de como pode ficar" },
-  { id: "projeto", icone: "🧱", titulo: "Quero um projeto completo",
-    sub: "Um ambiente, ou a casa toda em etapas, com orçamento fechado" },
-  { id: "movel", icone: "📦", titulo: "Quero comprar só um móvel planejado",
+  { id: "projeto", Icone: LayoutGrid, titulo: "Quero um projeto completo",
+    sub: "Um ambiente, vários, a casa toda, ou uma categoria específica, com orçamento fechado" },
+  { id: "movel", Icone: Package, titulo: "Quero comprar só um móvel planejado",
     sub: "Já sei o que preciso, é uma peça avulsa" },
-  { id: "medida", icone: "📐", titulo: "Preciso de ajuda com as medidas",
+  { id: "medida", Icone: Ruler, titulo: "Preciso de ajuda com as medidas",
     sub: "Fotografar, enviar planta ou digitar as medidas do ambiente" },
-  { id: "duvida", icone: "💬", titulo: "Tenho dúvidas técnicas antes de decidir",
+  { id: "duvida", Icone: MessageCircle, titulo: "Tenho dúvidas técnicas antes de decidir",
     sub: "Falar agora com o suporte especializado" },
-  { id: "preco", icone: "💰", titulo: "Quero entender os preços antes de decidir",
+  { id: "preco", Icone: Tag, titulo: "Quero entender os preços antes de decidir",
     sub: "Ver o catálogo de móveis planejados com valores" },
 ];
 
@@ -22,9 +23,9 @@ export default function Onboarding() {
   const app = useApp();
 
   function escolher(id) {
-    if (id === "render") nav("/design");
-    else if (id === "projeto") nav("/projeto-completo");
-    else if (id === "movel") nav("/moveis-planejados");
+    if (id === "render") { app.setDesignAmbiente(null); app.setDesignFoto(null); app.setDesignResultado(null); app.setDesignErro(null); nav("/design"); }
+    else if (id === "projeto") { app.limparFluxoProjeto(); nav("/projeto-completo"); }
+    else if (id === "movel") { app.setProdutoAtual(null); nav("/moveis-planejados"); }
     else if (id === "medida") nav("/projeto-completo/medida");
     else if (id === "duvida") app.setSuporteAberto(true);
     else if (id === "preco") nav("/categoria/moveis-planejados");
@@ -37,7 +38,7 @@ export default function Onboarding() {
 
       {OPCOES.map((o) => (
         <button key={o.id} className="opcaoMedida" onClick={() => escolher(o.id)}>
-          <span className="opcaoMedidaIcone">{o.icone}</span>
+          <span className="opcaoMedidaIcone"><o.Icone size={20} strokeWidth={1.6} /></span>
           <span className="opcaoMedidaTexto"><b>{o.titulo}</b><span>{o.sub}</span></span>
         </button>
       ))}

@@ -335,7 +335,7 @@ footer{display:none}
 .opcaoMedida{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--w);
   border:1.5px solid var(--navy6);border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer}
 .opcaoMedida:active{background:var(--navy7)}
-.opcaoMedidaIcone{font-size:26px;flex-shrink:0}
+.opcaoMedidaIcone{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:26px;height:26px;color:var(--navy2)}
 .opcaoMedidaTexto{display:flex;flex-direction:column;gap:2px}
 .opcaoMedidaTexto b{font-size:13.5px;color:var(--navy)}
 .opcaoMedidaTexto span{font-size:11px;color:var(--navy4)}

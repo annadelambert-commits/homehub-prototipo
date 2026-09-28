@@ -47,6 +47,30 @@ export default function Resumo() {
     app.setQuantidadeItem(it.id, it.categoriaId, (it.quantidade || 1) + delta);
   }
 
+  // ---- comparar com o orçamento informado na conversa com o concierge ----
+  const orcamentoCliente = app.briefing?.orcamento || null;
+  const acimaDoOrcamento = orcamentoCliente && total > orcamentoCliente * 1.03;
+  const margemFolga = orcamentoCliente ? orcamentoCliente - total : null;
+
+  // ordem de prioridade pra reduzir custo: primeiro o que é mais dispensável, mão de obra e material
+  // estrutural (piso, hidráulica, elétrica) ficam por último
+  const PRIORIDADE_REMOCAO = ["decoracao", "organizacao", "iluminacao", "moveis-prontos", "moveis-planejados", "pisos", "materiais", "hidraulica", "eletrica", "mao-de-obra"];
+
+  function versaoMaisEmConta() {
+    const restantes = [...itens].sort((a, b) => {
+      const pa = PRIORIDADE_REMOCAO.indexOf(a.categoriaId); const pb = PRIORIDADE_REMOCAO.indexOf(b.categoriaId);
+      return (pa === -1 ? 999 : pa) - (pb === -1 ? 999 : pb) || b.valor - a.valor;
+    });
+    let novoSubtotal = subtotal;
+    const remover = [];
+    for (const it of restantes) {
+      if (!orcamentoCliente || novoSubtotal * (1 - desconto.pct / 100) + medicao + 240 <= orcamentoCliente) break;
+      remover.push(it);
+      novoSubtotal -= brl0v(it);
+    }
+    remover.forEach((it) => app.toggleItemProjeto(it));
+  }
+
   function adicionar() {
     for (const it of itens) {
       app.adicionarAoCarrinho({ nome: it.nome + (it.quantidade > 1 ? ` ×${it.quantidade}` : "") + " (Projeto Completo)", valor: brl0v(it), montagem: 0, categoriaId: it.categoriaId });
@@ -100,6 +124,21 @@ export default function Resumo() {
       {clienteJaMediu && (
         <div className="cartao bom"><h4>Você economizou R$ 180,00</h4>
           <p>Por já ter enviado a medida, a visita técnica de medição não entra no orçamento.</p></div>
+      )}
+
+      {orcamentoCliente && (
+        acimaDoOrcamento ? (
+          <div className="cartao alerta">
+            <h4>Esse projeto passou do seu orçamento</h4>
+            <p>Você mencionou até {brl(orcamentoCliente)}. Esse pacote está {brl(total - orcamentoCliente)} acima. Posso ajustar pra uma versão mais em conta, removendo o que for menos essencial primeiro.</p>
+            <button className="btSecundario" style={{ marginTop: 10, width: "100%" }} onClick={versaoMaisEmConta}>Quero uma opção mais em conta</button>
+          </div>
+        ) : (
+          <div className="cartao bom">
+            <h4>Dentro do orçamento que você informou</h4>
+            <p>Você mencionou até {brl(orcamentoCliente)}. Esse pacote fecha com {brl(margemFolga)} de folga.</p>
+          </div>
+        )
       )}
 
       <div className="cartaoResumo">

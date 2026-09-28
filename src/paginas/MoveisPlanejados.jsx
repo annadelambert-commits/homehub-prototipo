@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Camera, Ruler, PenLine } from "lucide-react";
 import { useApp } from "../contexto/AppState";
 import AppFrame from "../componentes/AppFrame";
 import { REFERENCIAS, ANALISE_DEMO, PRODUTOS } from "../dados/homehub";
@@ -7,7 +8,7 @@ import { REFERENCIAS, ANALISE_DEMO, PRODUTOS } from "../dados/homehub";
 function brl0(v) { return "R$ " + Math.round(v).toLocaleString("pt-BR"); }
 function brl(v) { return "R$ " + v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-const PASSO = { INTRO: 0, FOTO: 1, PLANTA: 2, MANUAL: 3, MEDIDO: 4, CATALOGO: 5, RESUMO: 6 };
+const PASSO = { INTRO: 0, FOTO: 1, PLANTA: 2, MANUAL: 3, MEDIDO: 4, CATALOGO: 5, RESUMO: 6, CONFIRMA: 7 };
 
 export default function MoveisPlanejados() {
   const nav = useNavigate();
@@ -15,6 +16,9 @@ export default function MoveisPlanejados() {
   const [passo, setPasso] = useState(PASSO.INTRO);
   const [carregando, setCarregando] = useState(false);
   const [medidas, setMedidas] = useState({ largura: "", profundidade: "", altura: "" });
+  // se o cliente veio de um produto específico (catálogo/detalhe), guarda esse produto — capturado só na
+  // primeira renderização, pra não ser confundido com uma escolha feita mais tarde dentro do próprio fluxo
+  const [preSelecionado] = useState(() => app.produtoAtual);
 
   function onArquivo(e, destino) {
     const f = e.target.files[0];
@@ -71,7 +75,8 @@ export default function MoveisPlanejados() {
   }
 
   function solicitarOrcamento() {
-    setPasso(PASSO.CATALOGO);
+    if (preSelecionado) { app.setProdutoAtual(preSelecionado); setPasso(PASSO.CONFIRMA); }
+    else setPasso(PASSO.CATALOGO);
   }
 
   function adicionarMovelAoCarrinho() {
@@ -91,19 +96,23 @@ export default function MoveisPlanejados() {
     <AppFrame titulo="Móveis Planejados" comNavInferior={false}>
       {passo === PASSO.INTRO && (
         <>
-          <h2 className="tituloTela">Vamos medir seu ambiente</h2>
-          <p className="subtituloTela">Móveis planejados são feitos sob medida. Escolha como prefere medir o ambiente.</p>
+          <h2 className="tituloTela">{preSelecionado ? preSelecionado.nome : "Vamos medir seu ambiente"}</h2>
+          <p className="subtituloTela">
+            {preSelecionado
+              ? "Esse é um móvel planejado, feito sob medida. Antes de ir pro carrinho, precisamos do espaço disponível — escolha como prefere medir."
+              : "Móveis planejados são feitos sob medida. Escolha como prefere medir o ambiente."}
+          </p>
 
           <button className="opcaoMedida" onClick={() => setPasso(PASSO.FOTO)}>
-            <span className="opcaoMedidaIcone">📷</span>
+            <span className="opcaoMedidaIcone"><Camera size={20} strokeWidth={1.6} /></span>
             <span className="opcaoMedidaTexto"><b>Fotografar o ambiente</b><span>A IA de visão estima as medidas pela foto</span></span>
           </button>
           <button className="opcaoMedida" onClick={() => setPasso(PASSO.PLANTA)}>
-            <span className="opcaoMedidaIcone">📐</span>
+            <span className="opcaoMedidaIcone"><Ruler size={20} strokeWidth={1.6} /></span>
             <span className="opcaoMedidaTexto"><b>Enviar a planta do ambiente</b><span>Já tem a planta baixa? Envie e complemente as medidas</span></span>
           </button>
           <button className="opcaoMedida" onClick={() => setPasso(PASSO.MANUAL)}>
-            <span className="opcaoMedidaIcone">✏️</span>
+            <span className="opcaoMedidaIcone"><PenLine size={20} strokeWidth={1.6} /></span>
             <span className="opcaoMedidaTexto"><b>Digitar as medidas do ambiente</b><span>Informe largura, profundidade e pé-direito</span></span>
           </button>
 
@@ -229,6 +238,34 @@ export default function MoveisPlanejados() {
           </div>
         </>
       )}
+
+      {passo === PASSO.CONFIRMA && app.produtoAtual && (() => {
+        const p = app.produtoAtual;
+        const cabe = !vao || !p.l || p.l <= vao;
+        return (
+          <>
+            <h2 className="tituloTela">Conferindo o espaço</h2>
+            <div className="produtoCard largo sel" style={{ pointerEvents: "none" }}>
+              <div className="produtoImg foto" style={{ backgroundImage: `url(${p.img})` }} />
+              <div className="produtoInfo">
+                <b>{p.nome}</b>
+                <span className="produtoDesc">{p.l ? `${p.l} × ${p.p} × ${p.a} cm. ` : ""}{p.desc}</span>
+                <span className="produtoPreco">{brl0(p.valor)}</span>
+                {vao && p.l && <span className={"tagCabe " + (cabe ? "sim" : "nao")}>{cabe ? `cabe no espaço, sobram ${vao - p.l} cm` : "não cabe no espaço medido"}</span>}
+              </div>
+            </div>
+            {cabe ? (
+              <div className="cartao bom"><h4>Esse móvel cabe no seu espaço</h4><p>As medidas informadas são compatíveis. A medição final é confirmada na execução.</p></div>
+            ) : (
+              <div className="cartao alerta"><h4>Esse móvel não cabe no espaço medido</h4><p>Escolha outra opção do catálogo que caiba no vão disponível.</p></div>
+            )}
+            <div className="ctaFixo">
+              <button className="btPrimario" disabled={!cabe} onClick={adicionarMovelAoCarrinho}>Adicionar ao carrinho</button>
+              <button className="btSecundario" onClick={() => setPasso(PASSO.CATALOGO)}>Ver outras opções que cabem</button>
+            </div>
+          </>
+        );
+      })()}
 
       {passo === PASSO.RESUMO && app.produtoAtual && (
         <>

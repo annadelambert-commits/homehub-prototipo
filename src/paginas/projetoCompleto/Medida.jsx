@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Camera, Ruler, Map, ClipboardList } from "lucide-react";
 import { useApp } from "../../contexto/AppState";
 import AppFrame from "../../componentes/AppFrame";
 import { REFERENCIAS, ANALISE_DEMO, AMBIENTES } from "../../dados/homehub";
@@ -116,11 +117,11 @@ export default function Medida() {
         <p className="subtituloTela">Você escolheu {lista.length} {lista.length === 1 ? "ambiente" : "ambientes"}. Dá pra mandar uma planta única que cobre tudo, ou medir ambiente por ambiente.</p>
 
         <button className="opcaoMedida" onClick={() => setModo(MODO.PLANTA_COMPLETA)}>
-          <span className="opcaoMedidaIcone">🗺️</span>
+          <span className="opcaoMedidaIcone"><Map size={20} strokeWidth={1.6} /></span>
           <span className="opcaoMedidaTexto"><b>Enviar uma planta baixa completa</b><span>Uma imagem ou PDF que já cobre todos os ambientes selecionados</span></span>
         </button>
         <button className="opcaoMedida" onClick={() => setModo(MODO.POR_AMBIENTE)}>
-          <span className="opcaoMedidaIcone">📋</span>
+          <span className="opcaoMedidaIcone"><ClipboardList size={20} strokeWidth={1.6} /></span>
           <span className="opcaoMedidaTexto"><b>Ambiente por ambiente</b><span>Para cada ambiente, foto, medidas digitadas ou planta individual</span></span>
         </button>
       </AppFrame>
@@ -191,15 +192,15 @@ export default function Medida() {
         <h2 className="tituloTela">Como medir: {ambienteAtual.nome}?</h2>
 
         <button className="opcaoMedida" onClick={() => setSub(SUB.FOTO)}>
-          <span className="opcaoMedidaIcone">📷</span>
+          <span className="opcaoMedidaIcone"><Camera size={20} strokeWidth={1.6} /></span>
           <span className="opcaoMedidaTexto"><b>Fotografar o ambiente</b><span>IA de visão estima as medidas pela foto</span></span>
         </button>
         <button className="opcaoMedida" onClick={() => setSub(SUB.MANUAL)}>
-          <span className="opcaoMedidaIcone">📐</span>
+          <span className="opcaoMedidaIcone"><Ruler size={20} strokeWidth={1.6} /></span>
           <span className="opcaoMedidaTexto"><b>Digitar as medidas</b><span>Se você já sabe largura, profundidade e pé-direito</span></span>
         </button>
         <button className="opcaoMedida" onClick={() => setSub(SUB.PLANTA)}>
-          <span className="opcaoMedidaIcone">🗺️</span>
+          <span className="opcaoMedidaIcone"><Map size={20} strokeWidth={1.6} /></span>
           <span className="opcaoMedidaTexto"><b>Enviar planta deste ambiente</b><span>Uma planta baixa só deste cômodo</span></span>
         </button>
       </AppFrame>

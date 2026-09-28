@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Moon, Settings } from "lucide-react";
 import { useApp } from "../contexto/AppState";
 import AppFrame from "../componentes/AppFrame";
 
@@ -36,10 +37,12 @@ export default function Login() {
       )}
 
       <button className="trocaPerfilBt" onClick={() => nav("/ia-executiva")}>
-        <span>🌙 Trocar para modo executivo</span>
+        <span><Moon size={15} strokeWidth={1.8} style={{ verticalAlign: "-2px", marginRight: 6 }} />Trocar para modo executivo</span>
         <span className="trocaPerfilSub">IA Executiva, uso interno, não visível ao cliente</span>
       </button>
-      <button className="linhaMenu painelLink" onClick={() => nav("/painel-expansao")}>⚙ Painel HomeHub (interno)</button>
+      <button className="linhaMenu painelLink" onClick={() => nav("/painel-expansao")}>
+        <Settings size={14} strokeWidth={1.8} style={{ verticalAlign: "-2px", marginRight: 6 }} />Painel HomeHub (interno)
+      </button>
     </AppFrame>
   );
 }

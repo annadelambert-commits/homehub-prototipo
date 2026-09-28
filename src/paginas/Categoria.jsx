@@ -13,8 +13,10 @@ export default function Categoria() {
   const produtos = PRODUTOS[categoriaId] || [];
   const ehPlanejados = categoriaId === "moveis-planejados";
 
+  // móveis planejados são sob medida: não vão direto pro carrinho, precisam de foto/medida/planta antes
   function adicionarRapido(p, e) {
     e.stopPropagation();
+    if (ehPlanejados) { app.setProdutoAtual(p); nav("/moveis-planejados"); return; }
     app.adicionarAoCarrinho({ nome: p.nome, valor: p.valor, montagem: p.montagem || 0, categoriaId });
   }
 
@@ -43,7 +45,7 @@ export default function Categoria() {
               <span className="produtoFotoCategoria">{cat ? cat.nome.toUpperCase() : ""}</span>
               <b>{p.nome}</b>
               <span className="produtoFotoPreco">{brl(p.valor)}{p.unidade ? "/" + p.unidade : ""}</span>
-              <button className="btAdicionarMini" onClick={(e) => adicionarRapido(p, e)}>Adicionar ao carrinho</button>
+              <button className="btAdicionarMini" onClick={(e) => adicionarRapido(p, e)}>{ehPlanejados ? "Ver o que preciso medir" : "Adicionar ao carrinho"}</button>
             </div>
           </button>
         ))}

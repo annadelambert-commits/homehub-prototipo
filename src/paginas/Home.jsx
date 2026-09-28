@@ -1,12 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Search, Sparkles, Star } from "lucide-react";
 import AppFrame from "../componentes/AppFrame";
+import { useApp } from "../contexto/AppState";
 import { CATEGORIAS, SERVICOS, IMG_HERO } from "../dados/homehub";
 
 export default function Home() {
   const nav = useNavigate();
+  const app = useApp();
   const destaque = CATEGORIAS.slice(0, 6);
   const [busca, setBusca] = useState("");
+
+  function irParaDesign() {
+    app.setDesignAmbiente(null); app.setDesignFoto(null); app.setDesignResultado(null); app.setDesignErro(null);
+    nav("/design");
+  }
 
   function irParaBusca(e) {
     e.preventDefault();
@@ -17,7 +25,7 @@ export default function Home() {
   return (
     <AppFrame titulo="" voltar={false}>
       <form className="buscaTopo" onSubmit={irParaBusca}>
-        <span>🔍</span>
+        <span><Search size={17} strokeWidth={1.8} /></span>
         <input type="text" placeholder="Buscar produtos, ambientes ou soluções"
           value={busca} onChange={(e) => setBusca(e.target.value)} />
         {busca && <button type="submit" className="buscaTopoBt">Buscar</button>}
@@ -30,8 +38,8 @@ export default function Home() {
         <span className="heroCta">Começar meu projeto →</span>
       </button>
 
-      <button className="cardDesign" onClick={() => nav("/design")}>
-        <div className="cardDesignTag">✨ NOVO · IA DE DESIGN</div>
+      <button className="cardDesign" onClick={irParaDesign}>
+        <div className="cardDesignTag"><Sparkles size={11} strokeWidth={2} style={{ verticalAlign: "-1px", marginRight: 4 }} />NOVO · IA DE DESIGN</div>
         <div className="cardDesignTxt">
           <b>Não sabe por onde começar?</b>
           <span>Fotografe o ambiente, escolha um estilo e a IA projeta sua reforma, com tudo que você precisa para realizá-la.</span>
@@ -59,7 +67,7 @@ export default function Home() {
               <b>{s.nome}</b>
               <p>{s.desc}</p>
             </div>
-            <span className="servicoNota">★ {s.nota.toFixed(1)}</span>
+            <span className="servicoNota"><Star size={12} strokeWidth={0} fill="currentColor" style={{ verticalAlign: "-1px", marginRight: 3 }} />{s.nota.toFixed(1)}</span>
           </div>
         ))}
       </div>

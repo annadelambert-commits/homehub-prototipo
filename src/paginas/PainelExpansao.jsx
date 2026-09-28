@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Star } from "lucide-react";
 import { REGIOES_EXPANSAO } from "../dados/homehub";
 import AppFrame from "../componentes/AppFrame";
 
@@ -58,7 +59,7 @@ export default function PainelExpansao() {
               <div><span>Clientes potenciais</span><b>{r.clientesPotenciais.toLocaleString("pt-BR")}</b></div>
               <div><span>Ticket médio</span><b>{brl0(r.ticketMedio)}</b></div>
               <div><span>Executores certificados</span><b>{r.executoresCertificados}</b></div>
-              <div><span>Satisfação</span><b>★ {r.notaSatisfacao.toFixed(1)}</b></div>
+              <div><span>Satisfação</span><b><Star size={12} strokeWidth={0} fill="currentColor" style={{ verticalAlign: "-1px", marginRight: 3 }} />{r.notaSatisfacao.toFixed(1)}</b></div>
             </div>
           </div>
         ))}

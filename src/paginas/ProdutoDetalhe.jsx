@@ -12,10 +12,12 @@ export default function ProdutoDetalhe() {
   const app = useApp();
   const [adicionado, setAdicionado] = useState(false);
   const produto = (PRODUTOS[categoriaId] || []).find((p) => String(p.id) === produtoId);
+  const ehPlanejados = categoriaId === "moveis-planejados";
 
   if (!produto) return <AppFrame titulo="Produto"><p className="vazioTxt">Produto não encontrado.</p></AppFrame>;
 
   function adicionar() {
+    if (ehPlanejados) { app.setProdutoAtual(produto); nav("/moveis-planejados"); return; }
     app.adicionarAoCarrinho({ nome: produto.nome, valor: produto.valor, montagem: produto.montagem || 0, categoriaId });
     setAdicionado(true);
   }
@@ -33,7 +35,7 @@ export default function ProdutoDetalhe() {
         {adicionado ? (
           <button className="btPrimario" onClick={() => nav("/carrinho")}>Ver carrinho</button>
         ) : (
-          <button className="btPrimario" onClick={adicionar}>Adicionar ao carrinho</button>
+          <button className="btPrimario" onClick={adicionar}>{ehPlanejados ? "Ver o que preciso medir" : "Adicionar ao carrinho"}</button>
         )}
       </div>
     </AppFrame>

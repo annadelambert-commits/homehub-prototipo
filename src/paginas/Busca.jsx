@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { Search } from "lucide-react";
 import AppFrame from "../componentes/AppFrame";
 import { CATEGORIAS, PRODUTOS } from "../dados/homehub";
 
@@ -34,7 +35,7 @@ export default function Busca() {
   return (
     <AppFrame titulo="Buscar">
       <div className="buscaTopo" style={{ marginBottom: 18 }}>
-        <span>🔍</span>
+        <span><Search size={17} strokeWidth={1.8} /></span>
         <input type="text" autoFocus placeholder="Buscar produtos, ambientes ou soluções"
           value={q} onChange={(e) => setQ(e.target.value)} />
       </div>

@@ -18,14 +18,14 @@ Responda SOMENTE com um objeto JSON válido, sem markdown, sem crases, sem texto
 Se o cliente não mencionar orçamento, estilo ou prazo, use null nesses campos — não invente valores.
 O campo "ambiente" deve ser o nome do cômodo ou espaço (ex.: "cozinha", "banheiro", "quarto").
 
-O campo "escopo" é "categoria" quando o cliente pede claramente um tipo específico de item em vez de um projeto
-completo do ambiente — por exemplo "só quero trocar o piso", "só pintar as paredes", "preciso só de um armário".
-Nesse caso, preencha "categoria" com o id que melhor descreve o pedido, escolhendo entre: "pisos" (piso,
-revestimento, porcelanato), "materiais" (tinta, argamassa, cimento, massa corrida), "moveis-planejados" (armários,
-cozinhas planejadas, closets), "moveis-prontos" (sofás, mesas prontas), "decoracao" (tapetes, quadros, cortinas),
-"iluminacao" (luminárias, fitas de LED), "organizacao" (closets aéreos, organizadores). Em qualquer outro caso,
-inclusive quando o cliente pede uma reforma completa do ambiente sem restringir a um tipo de item, use
-"escopo":"completo" e "categoria":null.`;
+O campo "escopo" é "categoria" quando o cliente pede claramente um tipo específico de serviço/sistema em vez de um
+projeto completo do ambiente — por exemplo "só quero trocar o piso", "só pintar as paredes", "problema no
+encanamento", "preciso trocar a fiação". Nesse caso, preencha "categoria" com um destes ids: "piso" (piso,
+revestimento, porcelanato, contrapiso), "hidraulica" (torneira, vaso sanitário, box, registro, cano, vazamento),
+"eletrica" (fiação, tomada, disjuntor, quadro de força), "pintura" (tinta, pintura de parede, textura). Em
+qualquer outro caso, inclusive quando o cliente pede uma reforma completa do ambiente sem restringir a um tipo de
+serviço, ou pede móveis planejados / decoração / organização (que fazem parte do projeto completo, não de uma
+categoria de obra), use "escopo":"completo" e "categoria":null.`;
 
 const PROMPT_SUPORTE = `Você é o assistente de suporte especializado da HomeHub, uma rede de produtos para casa,
 decoração e reforma. Responda dúvidas técnicas objetivas sobre produtos, instalação, compatibilidade e prazos,
