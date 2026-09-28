@@ -35,6 +35,7 @@ com endereço e pagamento, e o fluxo de **Projeto Completo** com duas IAs reais.
 | Tela | Mecanismo |
 |---|---|
 | Concierge | IA real (modelo de linguagem) |
+| Design / Render (estilo + paleta) | IA real de texto (descrição do projeto); render visual usa imagem de demonstração |
 | Medida (caminho foto) | IA real (modelo de visão) |
 | Medida (caminho planta/manual) | Sem IA — dado informado pelo cliente |
 | Suporte especializado | IA real (modelo de linguagem) |

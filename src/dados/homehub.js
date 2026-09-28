@@ -135,3 +135,49 @@ export const REGIOES_EXPANSAO = [
   { id: "rs", nome: "Porto Alegre, RS", clientesPotenciais: 1490, ticketMedio: 14700, executoresCertificados: 12, notaSatisfacao: 8.3 },
   { id: "sc", nome: "Florianópolis, SC", clientesPotenciais: 680, ticketMedio: 17400, executoresCertificados: 6, notaSatisfacao: 8.9 },
 ];
+
+// ===== IA de Design / Render — quarta IA voltada ao cliente =====
+export const ESTILOS_DESIGN = [
+  { id: "moderno", nome: "Moderno", desc: "Linhas retas, poucos ornamentos, funcional" },
+  { id: "boho", nome: "Boho", desc: "Fibras naturais, plantas, camadas e texturas" },
+  { id: "classico", nome: "Clássico", desc: "Simetria, madeira nobre, acabamentos refinados" },
+  { id: "escandinavo", nome: "Escandinavo", desc: "Claro, madeira clara, minimalista e aconchegante" },
+  { id: "industrial", nome: "Industrial", desc: "Concreto, metal aparente, tons crus" },
+  { id: "contemporaneo", nome: "Contemporâneo", desc: "Neutro sofisticado, misto de materiais" },
+];
+
+export const PALETAS_DESIGN = [
+  { id: "neutra", nome: "Neutros quentes", cores: ["#EDE6DC", "#C9B79C", "#8A7B68", "#4A4238"] },
+  { id: "fria", nome: "Frios serenos", cores: ["#EAF0F2", "#B7C9D3", "#5E7C8B", "#2E4550"] },
+  { id: "terrosa", nome: "Terrosa", cores: ["#F0E4D4", "#D8A47F", "#A85E3C", "#5C3A28"] },
+  { id: "verde", nome: "Verde natureza", cores: ["#EDF1E6", "#B8CBA0", "#6E8B5A", "#38492C"] },
+  { id: "vibrante", nome: "Vibrante", cores: ["#F5EFe6", "#E8A03C", "#C4472F", "#1F3A4D"] },
+];
+
+// imagens ilustrativas de "depois" (render de demonstração), por estilo — Unsplash, uso ilustrativo
+const RENDER = {
+  moderno: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=900&q=75&fm=jpg&fit=crop",
+  boho: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=900&q=75&fm=jpg&fit=crop",
+  classico: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=900&q=75&fm=jpg&fit=crop",
+  escandinavo: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&q=75&fm=jpg&fit=crop",
+  industrial: "https://images.unsplash.com/photo-1615529182904-14819c35db37?w=900&q=75&fm=jpg&fit=crop",
+  contemporaneo: "https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=900&q=75&fm=jpg&fit=crop",
+};
+export function renderPorEstilo(id) { return RENDER[id] || RENDER.moderno; }
+
+// itens que compõem o projeto gerado pela IA — cada item do render vira item do pacote
+export const PROJETO_DESIGN_ITENS = [
+  { id: "d1", nome: "Sofá 3 lugares em linho", cat: "Móveis prontos", valor: 3290, tipo: "produto" },
+  { id: "d2", nome: "Mesa de centro em madeira", cat: "Móveis prontos", valor: 780, tipo: "produto" },
+  { id: "d3", nome: "Tapete de fibra natural 2×3m", cat: "Decoração", valor: 890, tipo: "produto" },
+  { id: "d4", nome: "Painel ripado para TV (planejado)", cat: "Móveis planejados", valor: 2450, tipo: "produto" },
+  { id: "d5", nome: "Luminária de piso", cat: "Iluminação", valor: 640, tipo: "produto" },
+  { id: "d6", nome: "Cortina de linho + trilho", cat: "Decoração", valor: 1120, tipo: "produto" },
+  { id: "d7", nome: "Kit quadros e objetos decorativos", cat: "Decoração", valor: 560, tipo: "produto" },
+  { id: "d8", nome: "Tinta e pintura das paredes", cat: "Materiais", valor: 890, tipo: "material" },
+  { id: "d9", nome: "Montagem e instalação (mão de obra)", cat: "Serviço", valor: 1400, tipo: "servico" },
+  { id: "d10", nome: "Projeto e consultoria de ambientação", cat: "Serviço", valor: 600, tipo: "servico" },
+];
+
+// desconto de pacote: fechar tudo junto sai mais barato que item a item
+export const DESCONTO_PACOTE = 0.12;

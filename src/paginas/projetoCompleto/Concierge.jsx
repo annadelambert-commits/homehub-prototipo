@@ -28,10 +28,13 @@ export default function Concierge() {
     }
   }
 
+  const AMB = { cozinha: { nome: "cozinha", orc: 20000 }, banheiro: { nome: "banheiro", orc: 8000 }, sala: { nome: "sala de estar", orc: 12000 } };
+  const ambiente = AMB[app.projetoAtivoId] || AMB.cozinha;
+
   function usarExemplo() {
     app.setBriefing({
-      ambiente: "cozinha", orcamento: 20000, estilo: "moderno", prazo_dias: 45, prioridade: "funcionalidade",
-      resumo: "Entendi: uma cozinha nova, estilo moderno, orçamento de R$ 20.000, com prazo de 45 dias e foco em funcionalidade.",
+      ambiente: ambiente.nome, orcamento: ambiente.orc, estilo: "moderno", prazo_dias: 45, prioridade: "funcionalidade",
+      resumo: `Entendi: reforma de ${ambiente.nome}, estilo moderno, orçamento de R$ ${ambiente.orc.toLocaleString("pt-BR")}, prazo de 45 dias e foco em funcionalidade.`,
     });
     app.setErroConcierge(null);
   }
@@ -39,12 +42,12 @@ export default function Concierge() {
   return (
     <AppFrame titulo="Projeto Completo" comNavInferior={false}>
       <div className="passoIndicador"><i className="ativo" /><i /><i /><i /></div>
-      <h2 className="tituloTela">Conte o que você quer reformar</h2>
+      <h2 className="tituloTela">Conte como quer sua {ambiente.nome}</h2>
       {!app.briefing && (
         <>
           <p className="subtituloTela">Descreva em linguagem natural — orçamento, ambiente, estilo, o que for relevante. Uma IA de verdade organiza isso num projeto.</p>
           <textarea className="chatInput" rows={4} value={texto} onChange={(e) => setTexto(e.target.value)}
-            placeholder="Ex.: Tenho R$ 20 mil e quero reformar minha cozinha, algo moderno, em até 45 dias." />
+            placeholder={`Ex.: Quero reformar minha ${ambiente.nome}, algo moderno, com bastante espaço de armazenamento.`} />
           <div className="ctaFixo">
             <button className="btPrimario" disabled={!texto.trim() || carregando} onClick={enviarConcierge}>
               {carregando ? "Consultando a IA…" : "Enviar para o concierge"}

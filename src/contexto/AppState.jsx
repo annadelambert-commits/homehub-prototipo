@@ -20,6 +20,13 @@ export function AppProvider({ children }) {
   const [briefing, setBriefing] = useState(null);
   const [erroConcierge, setErroConcierge] = useState(null);
 
+  // IA de Design / Render
+  const [designFoto, setDesignFoto] = useState(null);
+  const [designEstilo, setDesignEstilo] = useState(null);
+  const [designPaleta, setDesignPaleta] = useState(null);
+  const [designResultado, setDesignResultado] = useState(null); // { render, resumo, itens }
+  const [designErro, setDesignErro] = useState(null);
+
   // Carrinho e loja
   const [carrinho, setCarrinho] = useState([]);
   const [produtoAtual, setProdutoAtual] = useState(null);
@@ -73,6 +80,8 @@ export function AppProvider({ children }) {
       medidaManual, setMedidaManual, origemMedida, setOrigemMedida,
       plantaImagem, setPlantaImagem, estatura, setEstatura, vaoUtil,
       briefing, setBriefing, erroConcierge, setErroConcierge,
+      designFoto, setDesignFoto, designEstilo, setDesignEstilo, designPaleta, setDesignPaleta,
+      designResultado, setDesignResultado, designErro, setDesignErro,
       carrinho, setCarrinho, adicionarAoCarrinho, removerDoCarrinho, totalCarrinho,
       produtoAtual, setProdutoAtual,
       usuario, setUsuario, endereco, setEndereco, formaPagamento, setFormaPagamento,

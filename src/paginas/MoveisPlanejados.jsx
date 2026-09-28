@@ -1,0 +1,184 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useApp } from "../contexto/AppState";
+import AppFrame from "../componentes/AppFrame";
+import { REFERENCIAS, ANALISE_DEMO } from "../dados/homehub";
+
+const PASSO = { INTRO: 0, FOTO: 1, PLANTA: 2, MANUAL: 3, MEDIDO: 4 };
+
+export default function MoveisPlanejados() {
+  const nav = useNavigate();
+  const app = useApp();
+  const [passo, setPasso] = useState(PASSO.INTRO);
+  const [carregando, setCarregando] = useState(false);
+  const [medidas, setMedidas] = useState({ largura: "", profundidade: "", altura: "" });
+
+  function onArquivo(e, destino) {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      if (destino === "foto") { app.setImagem(r.result); app.setMime(f.type); app.setAnalise(null); app.setErroAnalise(null); }
+      else app.setPlantaImagem(r.result);
+    };
+    r.readAsDataURL(f);
+  }
+
+  async function analisarFoto() {
+    setCarregando(true); app.setErroAnalise(null);
+    try {
+      const b64 = app.imagem.split(",")[1];
+      const resp = await fetch("/api/analisar", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imagem: b64, mime: app.mime, referenciaNome: app.referencia.nome, referenciaCm: app.referencia.cm }),
+      });
+      if (!resp.ok) throw new Error("status " + resp.status);
+      const dados = await resp.json();
+      if (!dados.vao || !dados.largura) throw new Error("incompleto");
+      app.setAnalise(dados); app.setOrigemMedida("ia");
+      setPasso(PASSO.MEDIDO);
+    } catch {
+      app.setErroAnalise("Não foi possível analisar agora. Verifique a ANTHROPIC_API_KEY — ou use a análise de demonstração.");
+    } finally { setCarregando(false); }
+  }
+  function usarDemo() { app.setAnalise(ANALISE_DEMO); app.setOrigemMedida("demo"); setPasso(PASSO.MEDIDO); }
+
+  function confirmarManual() {
+    if (!medidas.largura || !medidas.altura) return;
+    app.setAnalise({
+      largura: Number(medidas.largura), altura: Number(medidas.altura),
+      profundidade: Number(medidas.profundidade) || 60,
+      vao: Number(medidas.largura), confianca: "informada por você",
+    });
+    app.setOrigemMedida("manual");
+    setPasso(PASSO.MEDIDO);
+  }
+
+  function confirmarPlanta() {
+    // planta enviada, mas ainda precisa das medidas principais
+    if (!medidas.largura || !medidas.altura) { setPasso(PASSO.MANUAL); return; }
+    confirmarManual();
+  }
+
+  function solicitarOrcamento() {
+    // leva ao concierge, já com a medida no contexto
+    app.setBriefing(null);
+    nav("/projeto-completo?origem=planejados");
+  }
+
+  const a = app.analise;
+
+  return (
+    <AppFrame titulo="Móveis Planejados" comNavInferior={false}>
+      {passo === PASSO.INTRO && (
+        <>
+          <h2 className="tituloTela">Vamos medir seu ambiente</h2>
+          <p className="subtituloTela">Móveis planejados são feitos sob medida. A maioria das dúvidas some quando o ambiente é medido certo — escolha como prefere fazer.</p>
+
+          <button className="opcaoMedida" onClick={() => setPasso(PASSO.FOTO)}>
+            <span className="opcaoMedidaIcone">📷</span>
+            <span className="opcaoMedidaTexto"><b>Fotografar o ambiente</b><span>A IA de visão estima as medidas pela foto</span></span>
+          </button>
+          <button className="opcaoMedida" onClick={() => setPasso(PASSO.PLANTA)}>
+            <span className="opcaoMedidaIcone">📐</span>
+            <span className="opcaoMedidaTexto"><b>Enviar a planta do ambiente</b><span>Já tem a planta baixa? Envie e complemente as medidas</span></span>
+          </button>
+          <button className="opcaoMedida" onClick={() => setPasso(PASSO.MANUAL)}>
+            <span className="opcaoMedidaIcone">✏️</span>
+            <span className="opcaoMedidaTexto"><b>Digitar as medidas do ambiente</b><span>Informe largura, profundidade e pé-direito</span></span>
+          </button>
+
+          <div className="cartao" style={{ marginTop: 14 }}>
+            <h4>Precisa de ajuda antes de decidir?</h4>
+            <p>O suporte especializado por IA está no botão flutuante, em qualquer tela.</p>
+          </div>
+        </>
+      )}
+
+      {passo === PASSO.FOTO && (
+        <>
+          <h2 className="tituloTela">Fotografe o ambiente</h2>
+          <p className="subtituloTela">Enquadre a parede inteira e inclua um objeto de tamanho conhecido para servir de escala.</p>
+          {app.imagem && <img className="prevImg" src={app.imagem} alt="Foto" />}
+          <label className="soltaArquivo">
+            <b>{app.imagem ? "Trocar foto" : "Enviar foto do ambiente"}</b>
+            <span>Toque para escolher</span>
+            <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => onArquivo(e, "foto")} />
+          </label>
+          <label className="rotuloSecao">Objeto de referência na foto</label>
+          <select value={app.referencia.nome} onChange={(e) => app.setReferencia(REFERENCIAS.find((r) => r.nome === e.target.value))}>
+            {REFERENCIAS.map((r) => <option key={r.nome}>{r.nome}</option>)}
+          </select>
+          {carregando && <div className="carregando"><div className="pulso" /><p>Analisando o ambiente…</p></div>}
+          {app.erroAnalise && !carregando && <div className="cartao alerta" style={{ marginTop: 12 }}><p>{app.erroAnalise}</p></div>}
+          {!carregando && (
+            <div className="ctaFixo">
+              <button className="btPrimario" disabled={!app.imagem} onClick={analisarFoto}>Analisar com IA</button>
+              <button className="btSecundario" onClick={usarDemo}>Usar análise de demonstração</button>
+            </div>
+          )}
+        </>
+      )}
+
+      {passo === PASSO.PLANTA && (
+        <>
+          <h2 className="tituloTela">Envie a planta do ambiente</h2>
+          <p className="subtituloTela">Como você já tem a planta, a HomeHub não precisa mandar um técnico medir — isso vira desconto no orçamento.</p>
+          {app.plantaImagem && <img className="prevImg" src={app.plantaImagem} alt="Planta" />}
+          <label className="soltaArquivo">
+            <b>{app.plantaImagem ? "Trocar planta" : "Enviar planta baixa"}</b>
+            <span>Imagem ou PDF</span>
+            <input type="file" accept="image/*,.pdf" style={{ display: "none" }} onChange={(e) => onArquivo(e, "planta")} />
+          </label>
+          <label className="rotuloSecao">Medidas do ambiente (cm)</label>
+          <div className="linhaMedidas">
+            <input type="number" placeholder="Largura" value={medidas.largura} onChange={(e) => setMedidas({ ...medidas, largura: e.target.value })} />
+            <input type="number" placeholder="Profund." value={medidas.profundidade} onChange={(e) => setMedidas({ ...medidas, profundidade: e.target.value })} />
+            <input type="number" placeholder="Pé-direito" value={medidas.altura} onChange={(e) => setMedidas({ ...medidas, altura: e.target.value })} />
+          </div>
+          <div className="ctaFixo">
+            <button className="btPrimario" disabled={!medidas.largura || !medidas.altura} onClick={confirmarPlanta}>Continuar</button>
+          </div>
+        </>
+      )}
+
+      {passo === PASSO.MANUAL && (
+        <>
+          <h2 className="tituloTela">Medidas do ambiente</h2>
+          <p className="subtituloTela">Como é um projeto completo, informe as medidas do ambiente inteiro (não só do móvel).</p>
+          <label className="rotuloSecao">Largura da parede principal (cm)</label>
+          <input className="inputCheio" type="number" placeholder="Ex.: 320" value={medidas.largura} onChange={(e) => setMedidas({ ...medidas, largura: e.target.value })} />
+          <label className="rotuloSecao">Profundidade do ambiente (cm)</label>
+          <input className="inputCheio" type="number" placeholder="Ex.: 250" value={medidas.profundidade} onChange={(e) => setMedidas({ ...medidas, profundidade: e.target.value })} />
+          <label className="rotuloSecao">Pé-direito / altura (cm)</label>
+          <input className="inputCheio" type="number" placeholder="Ex.: 270" value={medidas.altura} onChange={(e) => setMedidas({ ...medidas, altura: e.target.value })} />
+          <div className="ctaFixo">
+            <button className="btPrimario" disabled={!medidas.largura || !medidas.altura} onClick={confirmarManual}>Confirmar medidas</button>
+          </div>
+        </>
+      )}
+
+      {passo === PASSO.MEDIDO && a && (
+        <>
+          <h2 className="tituloTela">Ambiente medido {app.origemMedida === "ia" ? <span className="tagIA">IA de visão</span> : app.origemMedida === "demo" ? <span className="tagCalc">demonstração</span> : <span className="tagCalc">informado por você</span>}</h2>
+          <div className="cartaoResumo">
+            <div className="linhaResumo"><span>Largura</span><b>{a.largura} cm</b></div>
+            <div className="linhaResumo"><span>Profundidade</span><b>{a.profundidade} cm</b></div>
+            <div className="linhaResumo"><span>Pé-direito</span><b>{a.altura} cm</b></div>
+          </div>
+          {app.origemMedida === "manual" && (
+            <div className="cartao bom"><h4>Sem custo de visita técnica</h4><p>Você informou as medidas — a taxa de medição não entra no orçamento.</p></div>
+          )}
+          <div className="cartao">
+            <h4>Próximo passo: seu orçamento sob medida</h4>
+            <p>Agora que o ambiente está medido, descreva como você quer o móvel (estilo, portas, prateleiras, cor) e a IA monta o orçamento com base nas medidas e nas suas especificações.</p>
+          </div>
+          <div className="ctaFixo">
+            <button className="btPrimario" onClick={solicitarOrcamento}>Solicitar orçamento →</button>
+            <button className="btSecundario" onClick={() => setPasso(PASSO.INTRO)}>Refazer medida</button>
+          </div>
+        </>
+      )}
+    </AppFrame>
+  );
+}

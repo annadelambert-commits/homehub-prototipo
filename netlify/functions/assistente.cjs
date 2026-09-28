@@ -27,6 +27,14 @@ pela equipe responsável, não pela IA.
 
 Responda apenas em texto simples, sem markdown, sem JSON.`;
 
+const PROMPT_DESIGN = `Você é o designer de interiores da HomeHub, que trabalha com uma IA de geração de imagem.
+O cliente escolheu um estilo e uma paleta de cores para reformar um ambiente. Você recebe o ambiente, o estilo e
+a paleta, e descreve de forma inspiradora, curta e concreta como ficará o ambiente reformado.
+
+Responda SOMENTE com um objeto JSON válido, sem markdown, sem crases, no formato:
+{"resumo":"2-3 frases descrevendo o ambiente reformado no estilo e paleta escolhidos, mencionando materiais e clima",
+"destaques":["3 a 4 elementos de destaque do projeto, frases curtas"]}`;
+
 const PROMPT_EXPANSAO = `Você é o analista interno da HomeHub responsável por recomendar a próxima região de
 expansão do programa "Reforma em Etapas", na Fase 2 do roadmap (depois do piloto no Sudeste). Você recebe uma
 lista de regiões candidatas, cada uma com: clientes potenciais na base, ticket médio local, número de
@@ -73,7 +81,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ erro: "Falta o campo: regioes (array não vazio)." }) };
   }
 
-  const systemPrompt = modo === "concierge" ? PROMPT_CONCIERGE : modo === "expansao" ? PROMPT_EXPANSAO : PROMPT_SUPORTE;
+  const systemPrompt = modo === "concierge" ? PROMPT_CONCIERGE : modo === "expansao" ? PROMPT_EXPANSAO : modo === "design" ? PROMPT_DESIGN : PROMPT_SUPORTE;
   const messages = modo === "expansao"
     ? [{ role: "user", content: JSON.stringify(regioes) }]
     : [...(Array.isArray(historico) ? historico.slice(-6) : []), { role: "user", content: mensagem }];
@@ -106,7 +114,7 @@ exports.handler = async (event) => {
       .join("\n")
       .trim();
 
-    if (modo === "concierge" || modo === "expansao") {
+    if (modo === "concierge" || modo === "expansao" || modo === "design") {
       const limpo = texto.replace(/```json/g, "").replace(/```/g, "").trim();
       const ini = limpo.indexOf("{");
       const fim = limpo.lastIndexOf("}");

@@ -21,6 +21,14 @@ export default function Home() {
         <span className="heroCta">Começar meu projeto →</span>
       </button>
 
+      <button className="cardDesign" onClick={() => nav("/design")}>
+        <div className="cardDesignTag">✨ NOVO · IA DE DESIGN</div>
+        <div className="cardDesignTxt">
+          <b>Não sabe por onde começar?</b>
+          <span>Fotografe o ambiente, escolha um estilo e a IA projeta sua reforma — com tudo que você precisa para realizá-la.</span>
+        </div>
+      </button>
+
       <div className="secaoTopoLinha">
         <h3 className="secaoTitulo">Comprar por categoria</h3>
         <button className="verTudo" onClick={() => nav("/categorias")}>Ver tudo</button>
