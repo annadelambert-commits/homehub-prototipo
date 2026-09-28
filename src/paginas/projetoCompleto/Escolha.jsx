@@ -104,7 +104,10 @@ export default function Escolha() {
                       <button onClick={(e) => mudarQtd(p, g.categoriaId, -1, e)} disabled={qtd <= 1}>−</button>
                       <span>{qtd}{p.unidade ? " " + p.unidade : "×"}</span>
                       <button onClick={(e) => mudarQtd(p, g.categoriaId, 1, e)}>+</button>
-                      <span className="tagCabe sim" style={{ marginLeft: "auto" }}>✓ remover</span>
+                      <button type="button" className="tagCabe sim btRemoverInline" style={{ marginLeft: "auto" }}
+                        onClick={(e) => { e.stopPropagation(); toggle(p, g.categoriaId); }}>
+                        ✕ remover
+                      </button>
                     </div>
                   ) : (
                     <span className="tagCabe mov">toque para adicionar</span>

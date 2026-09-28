@@ -12,6 +12,16 @@ const TIPOS_REFORMA = [
   { id: "categoria", Icone: Wrench, titulo: "Uma categoria específica", sub: "Ex.: só o piso, só a parte elétrica, só a hidráulica" },
 ];
 
+// tenta casar o texto livre que a IA extraiu (ex.: "cozinha", "banheiro pequeno") com um id cadastrado em
+// AMBIENTES, comparando pelo nome — usado pra corrigir o ambiente selecionado quando o cliente descreve um
+// ambiente diferente do que clicou antes na grade de chips.
+function encontrarAmbientePorTexto(texto) {
+  if (!texto) return null;
+  const norm = texto.toLowerCase();
+  const candidatos = [...AMBIENTES].sort((a, b) => b.nome.length - a.nome.length);
+  return candidatos.find((a) => norm.includes(a.nome.toLowerCase())) || null;
+}
+
 export default function Concierge() {
   const nav = useNavigate();
   const app = useApp();
@@ -32,6 +42,15 @@ export default function Concierge() {
       const dados = await resp.json();
       if (!dados.ambiente) throw new Error("resposta incompleta");
       app.setBriefing(dados);
+      // se o cliente descreveu um ambiente diferente do que tinha clicado nos chips antes (ex.: clicou banheiro
+      // sem querer, mas escreveu "reforma da cozinha"), o texto livre é a fonte mais confiável da intenção real —
+      // corrige a seleção pra bater com o que a IA entendeu, só no fluxo de ambiente único.
+      if (tipoReforma === "unico") {
+        const ambienteDetectado = encontrarAmbientePorTexto(dados.ambiente);
+        if (ambienteDetectado && !app.ambientesSelecionados.includes(ambienteDetectado.id)) {
+          app.setAmbientesSelecionados([ambienteDetectado.id]);
+        }
+      }
       // se o cliente já escolheu explicitamente "categoria específica" nos botões, isso vale mais que a
       // leitura da IA sobre o texto livre — só deixa a IA decidir o escopo nos outros formatos de reforma
       if (tipoReforma !== "categoria") {
