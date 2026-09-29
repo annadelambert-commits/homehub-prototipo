@@ -19,7 +19,12 @@ export default function Projetos() {
   ];
 
   function irParaProjeto(id) {
+    // limpa qualquer projeto anterior (ambiente, briefing, carrinho do projeto...) antes de entrar —
+    // sem isso, se o cliente já tinha começado outro ambiente nessa sessão (ex.: piscina + sala), o
+    // concierge reabre com o contexto antigo em vez do ambiente que acabou de escolher aqui.
+    app.limparFluxoProjeto();
     app.setProjetoAtivoId(id);
+    app.setAmbientesSelecionados([id]);
     nav("/projeto-completo");
   }
 

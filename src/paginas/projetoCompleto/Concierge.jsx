@@ -88,6 +88,17 @@ export default function Concierge() {
         const estiloDetectado = encontrarEstiloPorTexto(dados.estilo);
         if (estiloDetectado) app.setProjetoEstilo(estiloDetectado.id);
       }
+      // categorias que o cliente disse explicitamente que não quer (ex.: "não quero elétrica nem iluminação")
+      // usam o mesmo mecanismo de exclusão do checklist "já tenho" — a tela de escolha de itens já sabe
+      // pular categorias marcadas ali, então não precisa de um caminho novo pra isso.
+      if (Array.isArray(dados.excluir) && dados.excluir.length > 0) {
+        const chave = chaveJaTem();
+        const atuais = app.itensJaTem[chave] || [];
+        const validas = dados.excluir.filter((c) => typeof c === "string" && !atuais.includes(c));
+        if (validas.length > 0) {
+          app.setItensJaTem((m) => ({ ...m, [chave]: [...(m[chave] || []), ...validas] }));
+        }
+      }
     } catch {
       app.setErroConcierge("Não foi possível falar com o concierge agora. Confira a chave da API no Netlify, ou use o exemplo pronto abaixo.");
     } finally {

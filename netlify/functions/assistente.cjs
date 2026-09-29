@@ -13,7 +13,16 @@ que quer reformar. Extraia um briefing estruturado.
 Responda SOMENTE com um objeto JSON válido, sem markdown, sem crases, sem texto antes ou depois, no formato:
 {"ambiente":"texto curto","orcamento":<numero em reais, ou null se não informado>,"estilo":"texto curto ou null",
 "prazo_dias":<numero ou null>,"prioridade":"texto curto ou null","escopo":"completo" ou "categoria",
-"categoria":"id da categoria ou null","resumo":"uma frase natural confirmando o que entendeu, em português, para mostrar ao cliente"}
+"categoria":"id da categoria ou null","excluir":["ids de categoria que o cliente disse claramente que NÃO quer"],
+"resumo":"uma frase natural confirmando o que entendeu, em português, para mostrar ao cliente"}
+
+O campo "excluir" é um array (pode ser vazio) com os ids de categoria que o cliente disse explicitamente que não
+quer no projeto — frases como "não quero elétrica", "sem iluminação nova", "não preciso trocar o piso", "já tenho
+móveis, não preciso de planejados". Use SOMENTE estes ids, escolhendo os que combinam com o que o cliente
+excluiu: "moveis-planejados", "moveis-prontos", "decoracao", "pisos", "organizacao", "iluminacao", "hidraulica",
+"eletrica", "gesso", "portas-janelas", "materiais". Nunca inclua em "excluir" uma categoria que o cliente não
+mencionou negativamente — na dúvida, deixe de fora. O array vazio ([]) é o valor mais comum, quando o cliente não
+excluiu nada.
 
 Se o cliente não mencionar orçamento, estilo ou prazo, use null nesses campos — não invente valores.
 O campo "ambiente" deve ser o nome do cômodo ou espaço (ex.: "cozinha", "banheiro", "quarto").

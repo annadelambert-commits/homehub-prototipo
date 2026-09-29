@@ -6,18 +6,15 @@ import { PRODUTOS, CATEGORIAS, CATEGORIAS_REFORMA, AMBIENTES } from "../../dados
 
 function brl0(v) { return "R$ " + Math.round(v).toLocaleString("pt-BR"); }
 
-// faixas de preço aceitáveis pra cada prioridade — custo-benefício puxa pro econômico, estética
-// aceita pagar mais por acabamento, rapidez não filtra por faixa (o que importa ali é entrega, não preço)
-const FAIXAS_POR_PRIORIDADE = {
-  custo: ["economico", "intermediario"],
-  estetica: ["intermediario", "premium"],
-  rapidez: null, // sem filtro de faixa
-};
-
-function itemCombina(p, { estilo, faixasAceitas }) {
-  const passaEstilo = !estilo || !Array.isArray(p.estilo) || p.estilo.includes(estilo);
-  const passaFaixa = !faixasAceitas || !p.faixa || faixasAceitas.includes(p.faixa);
-  return passaEstilo && passaFaixa;
+// o nível de pacote (econômico / equilibrado / completo) só afeta a ESCOLHA ENTRE PACOTES ALTERNATIVOS do
+// mesmo ambiente (dedupPacotesDeAmbiente, abaixo) — ex.: cozinha compacta x cozinha planejada. Os demais itens
+// (torneira, vaso, luminária...) não têm um "irmão" mais barato/mais caro cadastrado pra cada produto, então
+// filtrar por faixa de preço deixava categorias inteiras vazias de forma inconsistente entre ambientes, e o
+// total podia inverter (nível "mais completo" saindo mais barato que "mais econômico"). Só o preço do(s)
+// pacote(s) alternativo(s) muda com o nível — e isso já é garantidamente crescente (ver dedup abaixo) — então
+// o total nunca inverte.
+function itemCombina(p, { estilo }) {
+  return !estilo || !Array.isArray(p.estilo) || p.estilo.includes(estilo);
 }
 
 // alguns itens com tipo "ambiente" (ex.: "Cozinha Compacta Faina" x "Cozinha Planejada Ravel") são pacotes
@@ -52,7 +49,6 @@ export default function Escolha() {
   // mesma chave usada no Concierge pra guardar o checklist "já tenho" — combinação dos ambientes desse projeto
   const chaveJaTem = app.ambientesSelecionados.join("+") || "geral";
   const categoriasJaTem = app.itensJaTem[chaveJaTem] || [];
-  const faixasAceitas = FAIXAS_POR_PRIORIDADE[app.projetoPrioridade] ?? null;
 
   // categorias cujo filtro de estilo/faixa foi manualmente ignorado pelo cliente (botão "ver todas as opções")
   const [categoriasExpandidas, setCategoriasExpandidas] = useState([]);
@@ -68,7 +64,7 @@ export default function Escolha() {
   // e mostra a lista completa (não filtrada) só se o cliente pedir "ver todas as opções".
   const grupos = useMemo(() => {
     const out = [];
-    const criterios = { estilo: app.projetoEstilo, faixasAceitas };
+    const criterios = { estilo: app.projetoEstilo };
 
     function montarGrupo(categoriaId, itensBase) {
       if (categoriasJaTem.includes(categoriaId)) return;
@@ -94,17 +90,32 @@ export default function Escolha() {
         montarGrupo(categoriaId, itensBase);
       }
     } else {
+      const categoriasComItens = new Set();
       for (const categoriaId of Object.keys(PRODUTOS)) {
-        if (categoriaId === "mao-de-obra") continue; // mão de obra por sistema só entra no modo "categoria específica"
+        if (categoriaId === "mao-de-obra") continue; // mão de obra entra à parte, só pras frentes que de fato têm material (abaixo)
         const itensBase = PRODUTOS[categoriaId].filter((p) =>
           Array.isArray(p.ambientes) && p.ambientes.some((a) => app.ambientesSelecionados.includes(a))
         );
+        if (itensBase.length > 0 && !categoriasJaTem.includes(categoriaId)) categoriasComItens.add(categoriaId);
         montarGrupo(categoriaId, itensBase);
+      }
+      // mão de obra entra automaticamente pras frentes de reforma (piso, hidráulica, elétrica, pintura, gesso,
+      // portas e janelas...) que de fato têm material no projeto. Móveis planejados não passam por aqui — a
+      // mão de obra deles já é a "montagem" embutida no valor de cada peça (ver totalItensProjeto), então não
+      // duplica com uma linha genérica de mão de obra pro mesmo trabalho.
+      const escoposAtivos = CATEGORIAS_REFORMA.filter((c) => c.categorias.some((cid) => categoriasComItens.has(cid)));
+      if (escoposAtivos.length > 0 && PRODUTOS["mao-de-obra"] && !categoriasJaTem.includes("mao-de-obra")) {
+        const idsEscoposAtivos = new Set(escoposAtivos.map((c) => c.id));
+        const itensMaoDeObra = PRODUTOS["mao-de-obra"].filter((p) =>
+          Array.isArray(p.ambientes) && p.ambientes.some((a) => app.ambientesSelecionados.includes(a)) &&
+          idsEscoposAtivos.has(p.categoriaReforma)
+        );
+        montarGrupo("mao-de-obra", itensMaoDeObra);
       }
     }
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [app.ambientesSelecionados, categoriaReformaInfo, app.projetoEstilo, faixasAceitas, categoriasJaTem, categoriasExpandidas]);
+  }, [app.ambientesSelecionados, categoriaReformaInfo, app.projetoEstilo, app.projetoPrioridade, categoriasJaTem, categoriasExpandidas]);
 
   // o projeto já vem com tudo que é cabível (já filtrado por estilo/faixa) pré-selecionado no carrinho; o
   // cliente edita/remove a partir daí. Só preenche automaticamente quando o carrinho do projeto está vazio,
