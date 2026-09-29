@@ -113,8 +113,22 @@ export default function Escolha() {
     if (app.itensProjeto.length === 0 && grupos.length > 0) {
       grupos.forEach((g) => g.itens.forEach((p) => app.toggleItemProjeto({ ...p, categoriaId: g.categoriaId })));
     }
+    // roda de novo sempre que o carrinho do projeto voltar a ficar vazio (ex.: cliente trocou o nível do
+    // pacote em "Composição automática") — aí repõe com os itens já recalculados pra faixa nova.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [app.ambientesSelecionados, categoriaReformaInfo]);
+  }, [app.ambientesSelecionados, categoriaReformaInfo, app.itensProjeto.length === 0]);
+
+  // "Composição automática": troca o nível do pacote (mais econômico / equilibrado / mais completo) e
+  // limpa o carrinho do projeto pra reconstruir com a faixa nova — o useEffect acima repõe automaticamente.
+  function mudarNivelPacote(prioridade) {
+    app.setProjetoPrioridade(prioridade);
+    app.setItensProjeto([]);
+  }
+  const NIVEIS_PACOTE = [
+    { id: "custo", label: "Mais econômico" },
+    { id: "rapidez", label: "Equilibrado" },
+    { id: "estetica", label: "Mais completo" },
+  ];
 
   function estaSelecionado(p, categoriaId) {
     return app.itensProjeto.some((i) => i.id === p.id && i.categoriaId === categoriaId);
@@ -143,6 +157,26 @@ export default function Escolha() {
           ? "Já reunimos o material e a mão de obra dessa frente. Você pode remover ou ajustar qualquer item."
           : "Já reunimos tudo que é necessário pra esse projeto. Remova ou ajuste a quantidade do que não quiser."}
       </p>
+
+      {grupos.length > 0 && (
+        <div className="cartaoResumo" style={{ marginBottom: 12 }}>
+          <div className="linhaResumo"><span>Composição automática do seu projeto</span></div>
+          <p style={{ fontSize: 11, color: "var(--navy3)", margin: "2px 0 8px" }}>
+            Escopos incluídos: {grupos.map((g) => g.categoriaNome).join(" · ")}
+          </p>
+          <div className="linhaResumo total"><span>Total do pacote agora</span><b>{brl0(app.totalItensProjeto())}</b></div>
+          <div className="seletorQtd" style={{ marginTop: 10, justifyContent: "space-between" }}>
+            {NIVEIS_PACOTE.map((n) => (
+              <button key={n.id} type="button"
+                className={"btSecundario" + (app.projetoPrioridade === n.id ? " sel" : "")}
+                style={{ flex: 1, padding: "8px 6px", fontSize: 11 }}
+                onClick={() => mudarNivelPacote(n.id)}>
+                {n.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {grupos.map((g) => (
         <div key={g.categoriaId}>

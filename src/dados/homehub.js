@@ -48,6 +48,8 @@ export const CATEGORIAS = [
   { id: "mao-de-obra", nome: "Mão de Obra", cor: "#CBCBCB" },
   { id: "piscina", nome: "Piscina", cor: "#9FC9D3" },
   { id: "area-externa", nome: "Área Gourmet e Externa", cor: "#D9B48F" },
+  { id: "gesso", nome: "Gesso e Forro", cor: "#D8CFC4" },
+  { id: "portas-janelas", nome: "Portas e Janelas", cor: "#B8AA96" },
 ];
 
 // Reforma por categoria: cada tipo de reforma específica reúne material + mão de obra automaticamente.
@@ -58,6 +60,8 @@ export const CATEGORIAS_REFORMA = [
   { id: "pintura", nome: "Pintura", categorias: ["materiais"], maoDeObraCategoria: "pintura" },
   { id: "piscina", nome: "Equipamentos de piscina", categorias: ["piscina", "hidraulica"], maoDeObraCategoria: "hidraulica" },
   { id: "gourmet", nome: "Equipamentos de área gourmet", categorias: ["area-externa", "hidraulica"], maoDeObraCategoria: "hidraulica" },
+  { id: "gesso", nome: "Gesso e forro", categorias: ["gesso"], maoDeObraCategoria: "gesso" },
+  { id: "portas-janelas", nome: "Portas e janelas", categorias: ["portas-janelas"], maoDeObraCategoria: "portas-janelas" },
 ];
 
 export const IMG_HERO = IMG.hero;
@@ -171,12 +175,18 @@ export const PRODUTOS = {
     { id: 221, nome: "Refletor de LED Externo", valor: 210, desc: "IP65, resistente a chuva, 30W.", cor: "#E0C68E", ambientes: ["varanda", "jardim", "garagem", "piscina", "gourmet"], faixa: "economico" },
     { id: 222, nome: "Iluminação Subaquática de Piscina (LED RGB)", valor: 980, unidade: "un", desc: "Com controle remoto de cores.", cor: "#E0C68E", ambientes: ["piscina"], faixa: "intermediario" },
     { id: 223, nome: "Portão Eletrônico Basculante", valor: 2140, desc: "Kit motor, controle remoto e instalação.", cor: "#E0C68E", ambientes: ["garagem"], faixa: "intermediario" },
+    { id: 224, nome: "Ar-Condicionado Split 9000 BTUs", valor: 2190, desc: "Inclui instalação padrão de até 3m de tubulação.", cor: "#E0C68E",
+      ambientes: ["quarto", "escritorio", "quarto-bebe", "quarto-crianca"], faixa: "intermediario", exigeMedida: false, maoDeObraAplicavel: true },
+    { id: 225, nome: "Ar-Condicionado Split 12000 BTUs", valor: 2680, desc: "Inclui instalação padrão de até 3m de tubulação.", cor: "#E0C68E",
+      ambientes: ["sala", "gourmet"], faixa: "intermediario", maoDeObraAplicavel: true },
   ],
   "mao-de-obra": [
     { id: 140, nome: "Mão de Obra — Instalação de Piso", valor: 38, unidade: "m²", desc: "Assentamento e rejunte, por executor certificado.", cor: "#CBCBCB", ambientes: TODOS_AMBIENTES, categoriaReforma: "piso" },
     { id: 141, nome: "Mão de Obra — Serviço Hidráulico", valor: 620, desc: "Instalação e adequação de pontos hidráulicos do ambiente.", cor: "#CBCBCB", ambientes: TODOS_AMBIENTES, categoriaReforma: "hidraulica" },
     { id: 142, nome: "Mão de Obra — Serviço Elétrico", valor: 540, desc: "Instalação e adequação de pontos elétricos do ambiente.", cor: "#CBCBCB", ambientes: TODOS_AMBIENTES, categoriaReforma: "eletrica" },
     { id: 143, nome: "Mão de Obra — Pintura", valor: 22, unidade: "m²", desc: "Preparo de parede e duas demãos de tinta.", cor: "#CBCBCB", ambientes: TODOS_AMBIENTES, categoriaReforma: "pintura" },
+    { id: 144, nome: "Mão de Obra — Gesso e Forro", valor: 32, unidade: "m²", desc: "Instalação de forro, sanca ou divisória em drywall.", cor: "#CBCBCB", ambientes: TODOS_AMBIENTES, categoriaReforma: "gesso" },
+    { id: 145, nome: "Mão de Obra — Instalação de Porta ou Janela", valor: 280, desc: "Instalação de batente, folha e ferragens, por unidade.", cor: "#CBCBCB", ambientes: TODOS_AMBIENTES, categoriaReforma: "portas-janelas" },
   ],
   "decoracao": [
     { id: 40, nome: "Tapete Trama Natural 2×3m", valor: 890, desc: "Fibra natural, pronto-entrega.", img: IMG.decoracao, ambientes: ["sala", "quarto"],
@@ -268,6 +278,20 @@ export const PRODUTOS = {
       estilo: ["escandinavo", "boho"], faixa: "economico" },
     { id: 327, nome: "Móbile Decorativo com Luz Noturna", valor: 210, desc: "Projeta estrelas no teto, música suave.", img: IMG.prontos, ambientes: ["quarto-bebe"],
       estilo: ["escandinavo", "moderno"], faixa: "economico" },
+    { id: 330, nome: "Conjunto de Cadeiras para Sala de Jantar (6un)", valor: 2280, unidade: "kit 6un", desc: "Estofadas, estrutura em madeira maciça.", img: IMG.prontos, ambientes: ["sala", "cozinha"],
+      estilo: ["classico", "contemporaneo"], faixa: "intermediario", podeSerPlanejado: false, maoDeObraAplicavel: true },
+    { id: 331, nome: "Buffet para Sala de Jantar", valor: 1980, desc: "Portas de correr, tampo em madeira maciça.", img: IMG.prontos, ambientes: ["sala", "cozinha"],
+      estilo: ["classico", "escandinavo"], faixa: "intermediario", podeSerPlanejado: true, maoDeObraAplicavel: true },
+    { id: 332, nome: "Cômoda para Quarto", valor: 1290, desc: "5 gavetas, puxadores em metal escovado.", img: IMG.prontos, ambientes: ["quarto"],
+      estilo: ["moderno", "escandinavo"], faixa: "intermediario", podeSerPlanejado: true, maoDeObraAplicavel: true },
+    { id: 333, nome: "Criado-mudo com 2 Gavetas", valor: 480, desc: "Par, acabamento em MDF laqueado.", img: IMG.prontos, ambientes: ["quarto"],
+      estilo: ["moderno", "contemporaneo"], faixa: "economico", podeSerPlanejado: true },
+    { id: 334, nome: "Cabeceira Estofada Casal", valor: 890, desc: "Tecido bouclé, fixação na parede.", img: IMG.prontos, ambientes: ["quarto"],
+      estilo: ["contemporaneo", "boho"], faixa: "intermediario", podeSerPlanejado: true, maoDeObraAplicavel: true },
+    { id: 335, nome: "Armário Multiuso para Lavanderia", valor: 980, desc: "Portas altas, prateleiras internas ajustáveis.", img: IMG.prontos, ambientes: ["lavanderia"],
+      estilo: ["moderno"], faixa: "economico", podeSerPlanejado: true, maoDeObraAplicavel: true },
+    { id: 336, nome: "Banco de Jardim em Madeira", valor: 780, desc: "Madeira de reflorestamento tratada, 2 lugares.", img: IMG.jardim, ambientes: ["jardim", "varanda"],
+      estilo: ["boho", "classico"], faixa: "economico" },
   ],
   "jardim": [
     { id: 90, nome: "Conjunto Mesa e Cadeiras Externas", valor: 1690, desc: "Alumínio, resistente à chuva.", img: IMG.jardim, ambientes: ["jardim", "varanda", "gourmet"],
@@ -307,6 +331,28 @@ export const PRODUTOS = {
     { id: 305, nome: "Mesa e Bancos para Área Gourmet", valor: 2380, desc: "Madeira de reflorestamento, 6 lugares.", cor: "#D9B48F", ambientes: ["gourmet"],
       estilo: ["boho", "contemporaneo"], faixa: "intermediario" },
   ],
+  "gesso": [
+    { id: 400, nome: "Forro de Gesso Liso", valor: 58, unidade: "m²", desc: "Instalação com estrutura metálica, acabamento pronto para pintura.",
+      cor: "#D8CFC4", ambientes: TODOS_AMBIENTES, categoriaReforma: "gesso", faixa: "economico", exigeMedida: true, maoDeObraAplicavel: true },
+    { id: 401, nome: "Sanca com Iluminação Embutida", valor: 96, unidade: "m", desc: "Rasgo de luz em fita LED, acabamento em gesso.",
+      cor: "#D8CFC4", ambientes: ["sala", "quarto", "cozinha", "escritorio"], categoriaReforma: "gesso", faixa: "intermediario", exigeMedida: true, maoDeObraAplicavel: true },
+    { id: 402, nome: "Forro de Drywall com Isolamento Acústico", valor: 89, unidade: "m²", desc: "Placa RU, indicado para áreas molhadas e home office.",
+      cor: "#D8CFC4", ambientes: ["banheiro", "lavanderia", "escritorio"], categoriaReforma: "gesso", faixa: "premium", exigeMedida: true, maoDeObraAplicavel: true },
+    { id: 403, nome: "Divisória em Drywall", valor: 210, unidade: "m²", desc: "Estrutura em perfil metálico, duas faces de placa, acabamento pronto para pintura.",
+      cor: "#D8CFC4", ambientes: TODOS_AMBIENTES, categoriaReforma: "gesso", faixa: "intermediario", exigeMedida: true, exigeFotoPlanta: true, maoDeObraAplicavel: true },
+  ],
+  "portas-janelas": [
+    { id: 410, nome: "Porta de Madeira Maciça com Batente", valor: 890, desc: "Inclui dobradiças, fechadura e guarnição.",
+      cor: "#B8AA96", ambientes: TODOS_AMBIENTES, categoriaReforma: "portas-janelas", estilo: ["classico", "contemporaneo"], faixa: "intermediario", exigeMedida: true, maoDeObraAplicavel: true },
+    { id: 411, nome: "Porta de Correr de Vidro Temperado", valor: 1680, unidade: "un", desc: "Trilho superior embutido, ideal para varanda e integração de ambientes.",
+      cor: "#B8AA96", ambientes: ["sala", "varanda", "quarto"], categoriaReforma: "portas-janelas", estilo: ["moderno", "contemporaneo"], faixa: "premium", exigeMedida: true, maoDeObraAplicavel: true },
+    { id: 412, nome: "Janela de Alumínio de Correr", valor: 620, unidade: "m²", desc: "Vidro liso 4mm, com tela mosquiteira.",
+      cor: "#B8AA96", ambientes: TODOS_AMBIENTES, categoriaReforma: "portas-janelas", faixa: "intermediario", exigeMedida: true, maoDeObraAplicavel: true },
+    { id: 413, nome: "Janela Maxim-ar de Alumínio", valor: 480, unidade: "m²", desc: "Abertura para ventilação parcial, ideal para banheiro e cozinha.",
+      cor: "#B8AA96", ambientes: ["banheiro", "cozinha", "lavanderia"], categoriaReforma: "portas-janelas", faixa: "economico", exigeMedida: true, maoDeObraAplicavel: true },
+    { id: 414, nome: "Kit Fechadura e Dobradiças", valor: 210, desc: "Fechadura com cilindro e três dobradiças em aço inox.",
+      cor: "#B8AA96", ambientes: TODOS_AMBIENTES, categoriaReforma: "portas-janelas", faixa: "economico", maoDeObraAplicavel: true },
+  ],
 };
 
 // checklist "o que você já tem e não precisa trocar" — genérico por categoria, mostrado no Concierge só
@@ -324,6 +370,8 @@ export const JA_TENHO_OPCOES = [
   { categoriaId: "banheiro", label: "Itens de banheiro" },
   { categoriaId: "piscina", label: "Equipamentos de piscina" },
   { categoriaId: "area-externa", label: "Equipamentos de área gourmet" },
+  { categoriaId: "gesso", label: "Gesso e forro" },
+  { categoriaId: "portas-janelas", label: "Portas e janelas" },
 ];
 
 export const REFERENCIAS = [
