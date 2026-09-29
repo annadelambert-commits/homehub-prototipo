@@ -48,9 +48,21 @@ export default function Concierge() {
     if (!texto.trim()) return;
     setCarregando(true); app.setErroConcierge(null);
     try {
+      // manda pra IA só o que ainda não sabemos — ambiente, estilo, paleta e prioridade já vieram dos chips
+      // nas etapas anteriores, então isso vai como contexto confirmado, não como algo pra IA re-descobrir
+      // (ou pior, "esquecer" e perguntar de novo) a partir do texto livre do cliente.
+      const estiloNome = ESTILOS_DESIGN.find((e) => e.id === app.projetoEstilo)?.nome;
+      const paletaNome = PALETAS_DESIGN.find((p) => p.id === app.projetoPaleta)?.nome;
+      const prioridadeNome = PRIORIDADES.find((p) => p.id === app.projetoPrioridade)?.titulo;
+      const partesContexto = [`ambiente(s) = ${nomeAmbientes}`];
+      if (estiloNome) partesContexto.push(`estilo escolhido = ${estiloNome}`);
+      if (paletaNome) partesContexto.push(`paleta escolhida = ${paletaNome}`);
+      if (prioridadeNome) partesContexto.push(`prioridade = ${prioridadeNome}`);
+      const contexto = `[Já sei: ${partesContexto.join("; ")}.]\n\n`;
+
       const resp = await fetch("/api/assistente", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ modo: "concierge", mensagem: texto.trim() }),
+        body: JSON.stringify({ modo: "concierge", mensagem: contexto + texto.trim() }),
       });
       if (!resp.ok) throw new Error("status " + resp.status);
       const dados = await resp.json();
@@ -297,9 +309,11 @@ export default function Concierge() {
         <>
           <div className="cartao bom"><h4>Briefing estruturado pela IA</h4><p>{app.briefing.resumo}</p></div>
           <div className="cartaoResumo">
-            <div className="linhaResumo"><span>Ambiente(s)</span><b>{app.briefing.ambiente}</b></div>
+            {/* ambiente e estilo já são conhecidos com certeza (chips escolhidos antes) — mostra isso em vez do
+                que a IA leu do texto livre, que pode "esquecer" informação que não foi repetida na mensagem */}
+            <div className="linhaResumo"><span>Ambiente(s)</span><b>{nomeAmbientes}</b></div>
             <div className="linhaResumo"><span>Orçamento</span><b>{app.briefing.orcamento ? "R$ " + app.briefing.orcamento.toLocaleString("pt-BR") : "não informado"}</b></div>
-            <div className="linhaResumo"><span>Estilo</span><b>{app.briefing.estilo || "não informado"}</b></div>
+            <div className="linhaResumo"><span>Estilo</span><b>{ESTILOS_DESIGN.find((e) => e.id === app.projetoEstilo)?.nome || app.briefing.estilo || "não informado"}</b></div>
             {app.projetoPaleta && (
               <div className="linhaResumo"><span>Paleta de cores</span><b>{PALETAS_DESIGN.find((p) => p.id === app.projetoPaleta)?.nome}</b></div>
             )}

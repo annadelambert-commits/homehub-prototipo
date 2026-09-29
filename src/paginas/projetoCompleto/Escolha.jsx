@@ -20,6 +20,25 @@ function itemCombina(p, { estilo, faixasAceitas }) {
   return passaEstilo && passaFaixa;
 }
 
+// alguns itens com tipo "ambiente" (ex.: "Cozinha Compacta Faina" x "Cozinha Planejada Ravel") são pacotes
+// alternativos pro MESMO ambiente — o cliente escolhe um, não os dois. Sem isso, os dois combinam com o
+// filtro de estilo/faixa e entram juntos no carrinho, dobrando o projeto sem o cliente ter pedido isso.
+// Mantém só o melhor match por ambiente (conforme a prioridade); os demais só voltam a aparecer no "ver
+// todas as opções" (que usa a lista sem filtro nenhum).
+function dedupPacotesDeAmbiente(itens, ambientesSelecionados, prioridade) {
+  const ordemFaixa = prioridade === "estetica" ? ["premium", "intermediario", "economico"]
+    : prioridade === "custo" ? ["economico", "intermediario", "premium"]
+    : ["intermediario", "premium", "economico"];
+  const descartados = new Set();
+  for (const amb of ambientesSelecionados) {
+    const candidatos = itens.filter((p) => p.tipo === "ambiente" && Array.isArray(p.ambientes) && p.ambientes.includes(amb));
+    if (candidatos.length <= 1) continue;
+    const ordenados = [...candidatos].sort((a, b) => ordemFaixa.indexOf(a.faixa) - ordemFaixa.indexOf(b.faixa));
+    ordenados.slice(1).forEach((c) => descartados.add(c.id));
+  }
+  return descartados.size === 0 ? itens : itens.filter((p) => !descartados.has(p.id));
+}
+
 export default function Escolha() {
   const nav = useNavigate();
   const app = useApp();
@@ -54,9 +73,10 @@ export default function Escolha() {
     function montarGrupo(categoriaId, itensBase) {
       if (categoriasJaTem.includes(categoriaId)) return;
       if (itensBase.length === 0) return;
-      const itensFiltrados = itensBase.filter((p) => itemCombina(p, criterios));
+      let itensFiltrados = itensBase.filter((p) => itemCombina(p, criterios));
       const semCombinacao = itensFiltrados.length === 0;
       const expandido = categoriasExpandidas.includes(categoriaId);
+      if (!expandido) itensFiltrados = dedupPacotesDeAmbiente(itensFiltrados, app.ambientesSelecionados, app.projetoPrioridade);
       // sem combinação: só mostra a lista completa depois que o cliente clica "ver todas as opções"
       const itens = expandido ? itensBase : itensFiltrados;
       const cat = CATEGORIAS.find((c) => c.id === categoriaId);

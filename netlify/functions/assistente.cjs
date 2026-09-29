@@ -18,6 +18,14 @@ Responda SOMENTE com um objeto JSON válido, sem markdown, sem crases, sem texto
 Se o cliente não mencionar orçamento, estilo ou prazo, use null nesses campos — não invente valores.
 O campo "ambiente" deve ser o nome do cômodo ou espaço (ex.: "cozinha", "banheiro", "quarto").
 
+Se a mensagem começar com um trecho entre "[" e "]" contendo "Já sei:", esse trecho é contexto CONFIRMADO que o
+cliente já informou antes (ambiente, estilo, paleta ou prioridade escolhidos em outra etapa) — não é a fala do
+cliente. Use esse contexto diretamente nos campos correspondentes do JSON (ambiente, estilo) e NUNCA pergunte de
+novo por algo que já está nesse contexto. O "resumo" deve ser só uma frase afirmativa confirmando o que foi
+entendido (contexto + o que o cliente escreveu depois do trecho entre colchetes) — nunca uma pergunta. Se
+mesmo assim faltar alguma informação (ex.: orçamento), apenas deixe o campo null, sem transformar isso numa
+pergunta dentro do resumo.
+
 O campo "escopo" é "categoria" quando o cliente pede claramente um tipo específico de serviço/sistema em vez de um
 projeto completo do ambiente — por exemplo "só quero trocar o piso", "só pintar as paredes", "problema no
 encanamento", "preciso trocar a fiação". Nesse caso, preencha "categoria" com um destes ids: "piso" (piso,
